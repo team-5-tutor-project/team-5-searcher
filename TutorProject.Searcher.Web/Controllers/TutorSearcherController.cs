@@ -1,31 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
-using TutorProject.Searcher.Web.Services;
+using TutorProject.Searcher.BLL.Services;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
 [ApiController]
+[Route("/searcher")]
 public class TutorSearcherController : ControllerBase
 {
-    private readonly TutorSearcherService _service;
+    private readonly ITutorSearcherService _service;
 
     public TutorSearcherController(TutorContext context)
     {
         _service = new TutorSearcherService(context);
     }
     
-    [HttpGet("allTutors")]
-    public List<Tutor> GetAll()
+    [HttpGet("getAllTutors")]
+    public async Task<List<Tutor>> GetAll()
     {
-        var tutors = _service.GetAll();
-        return tutors;
+        return await _service.GetAll();
     }
     
     [HttpGet("search")]
-    public List<TutorToSubject> Search( string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
+    public async Task<List<TutorToSubject>> Search(string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
     {
-        var tutors = _service.Search(subject, workFormat, minPrice, maxPrice, pupilClass);
+        var tutors = await _service.Search( subject, workFormat, minPrice, maxPrice, pupilClass);
         return tutors;
     }
 }

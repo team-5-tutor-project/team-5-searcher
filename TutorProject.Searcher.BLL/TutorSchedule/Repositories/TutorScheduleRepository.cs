@@ -85,9 +85,6 @@ public class TutorScheduleRepository
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 
-        if (schedule == null)
-            return null;
-
         return schedule;
     }
 }

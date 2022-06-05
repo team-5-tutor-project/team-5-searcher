@@ -42,7 +42,7 @@ public class TutorScheduleController : ControllerBase
         return await _service.GetAllSchedules();
     }
     
-    [HttpPut("{tutorId}/getSchedule")]
+    [HttpGet("{tutorId}/getSchedule")]
     public async Task<Schedule> GetTutorSchedule(Guid tutorId)
     {
         var result = await _service.GetTutorSchedule(tutorId);

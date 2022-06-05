@@ -75,4 +75,9 @@ public class TutorScheduleRepository
         schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = true;
         return schedule;
     }
+    
+    public async Task<List<Schedule>> GetAllSchedules()
+    {
+        return await _context.Schedules.ToListAsync();
+    }
 }

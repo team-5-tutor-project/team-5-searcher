@@ -35,4 +35,10 @@ public class TutorScheduleController : ControllerBase
     {
         return await _service.SetAllTimeFree(tutorId);
     }
+    
+    [HttpGet("getAllSchedules")]
+    public async Task<List<Schedule>> GetAll()
+    {
+        return await _service.GetAllSchedules();
+    }
 }

@@ -27,4 +27,9 @@ public class TutorScheduleService : ITutorScheduleService
     {
         return await _repository.SetAllTimeFree(tutorId);
     }
+    
+    public async Task<List<Schedule>> GetAllSchedules()
+    {
+        return await _repository.GetAllSchedules();
+    }
 }

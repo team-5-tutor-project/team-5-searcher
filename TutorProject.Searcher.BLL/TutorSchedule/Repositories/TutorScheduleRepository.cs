@@ -73,6 +73,9 @@ public class TutorScheduleRepository
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 
         schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = true;
+        
+        await _context.SaveChangesAsync();
+        
         return schedule;
     }
 }

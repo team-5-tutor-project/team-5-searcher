@@ -32,4 +32,9 @@ public class TutorScheduleService : ITutorScheduleService
     {
         return await _repository.GetAllSchedules();
     }
+
+    public async Task<Schedule> GetTutorSchedule(Guid tutorId)
+    {
+        return await _repository.GetTutorSchedule(tutorId);
+    }
 }

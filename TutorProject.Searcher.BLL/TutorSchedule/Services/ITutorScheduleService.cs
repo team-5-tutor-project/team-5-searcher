@@ -8,4 +8,5 @@ public interface ITutorScheduleService
     Task<Schedule?> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber);
     Task<Schedule?> SetAllTimeFree(Guid tutorId);
     Task<List<Schedule>> GetAllSchedules();
+    Task<Schedule> GetTutorSchedule(Guid tutorId);
 }

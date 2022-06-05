@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
-using TutorProject.Searcher.BLL.Services;
+using TutorProject.Searcher.BLL.Searcher.Services;
 
 namespace TutorProject.Searcher.Web.Controllers;
 

@@ -1,8 +1,8 @@
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
-using TutorProject.Searcher.BLL.Repositories;
+using TutorProject.Searcher.BLL.Searcher.Repositories;
 
-namespace TutorProject.Searcher.BLL.Services;
+namespace TutorProject.Searcher.BLL.Searcher.Services;
 
 public class TutorSearcherService : ITutorSearcherService
 {

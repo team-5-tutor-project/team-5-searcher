@@ -17,22 +17,43 @@ public class TutorScheduleController : ControllerBase
     }
 
     [HttpPost("addSchedule")]
-    public async Task<Schedule?> AddSchedule([FromQuery] Guid tutorId)
+    public async Task<Schedule> AddSchedule([FromQuery] Guid tutorId)
     {
-        return await _service.AddSchedule(tutorId);
+        var result = await _service.AddSchedule(tutorId);
+        
+        if (result == null)
+        {
+            throw new Exception(BadRequest().ToString());
+        }
+        
+        return result;
     }
     
     [HttpPut("{tutorId}/addFreeTime")]
-    public async Task<Schedule?> AddFreeTime(Guid tutorId, 
+    public async Task<Schedule> AddFreeTime(Guid tutorId, 
         [FromQuery] DayOfWeek dayOfWeek,
         [FromQuery] int lessonNumber)
     {
-        return await _service.AddFreeTime(tutorId, dayOfWeek, lessonNumber);
+        var result = await _service.AddFreeTime(tutorId, dayOfWeek, lessonNumber);
+        
+        if (result == null)
+        {
+            throw new Exception(BadRequest().ToString());
+        }
+        
+        return result;
     }
     
     [HttpPut("{tutorId}/setAllTimeFree")]
-    public async Task<Schedule?> AddFreeTime(Guid tutorId)
+    public async Task<Schedule> AddFreeTime(Guid tutorId)
     {
-        return await _service.SetAllTimeFree(tutorId);
+        var result = await _service.SetAllTimeFree(tutorId);
+        
+        if (result == null)
+        {
+            throw new Exception(BadRequest().ToString());
+        }
+        
+        return result;
     }
 }

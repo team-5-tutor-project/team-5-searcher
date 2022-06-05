@@ -19,7 +19,9 @@ public class TutorScheduleRepository
 
     public async Task<Schedule?> AddSchedule(Guid tutorId)
     {
-        if (_context.Schedules.ToList().Any(sdl => sdl.Tutor.Id == tutorId))
+        var existingSchedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
+
+        if (existingSchedule is not null)
         {
             return null;
         }
@@ -41,14 +43,12 @@ public class TutorScheduleRepository
         return newSchedule;
     }
 
-    public async Task<Schedule?> SetAllTimeFree(Guid tutorId)
+    public async Task<Schedule> SetAllTimeFree(Guid tutorId)
     {
-        if (_context.Schedules.ToList().All(sdl => sdl.Tutor.Id != tutorId))
-        {
+        var schedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
+        
+        if (schedule == null)
             return null;
-        }
-
-        var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
         
         foreach (var day in schedule.FreeTimeSchedule)
         {
@@ -63,15 +63,13 @@ public class TutorScheduleRepository
         return schedule;
     }
 
-    public async Task<Schedule?> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
     {
-        if (_context.Schedules.ToList().All(sdl => sdl.Tutor.Id != tutorId))
-        {
-            return null;
-        }
-        
-        var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
+        var schedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
 
+        if (schedule == null)
+            return null;
+        
         schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = true;
         
         await _context.SaveChangesAsync();

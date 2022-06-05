@@ -13,17 +13,17 @@ public class TutorScheduleService : ITutorScheduleService
         _repository = new TutorScheduleRepository(context);
     }
 
-    public async Task<Schedule?> AddSchedule(Guid tutorId)
+    public async Task<Schedule> AddSchedule(Guid tutorId)
     {
         return await _repository.AddSchedule(tutorId);
     }
 
-    public async Task<Schedule?> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
     {
         return await _repository.AddFreeTime(tutorId, dayOfWeek, lessonNumber);
     }
 
-    public async Task<Schedule?> SetAllTimeFree(Guid tutorId)
+    public async Task<Schedule> SetAllTimeFree(Guid tutorId)
     {
         return await _repository.SetAllTimeFree(tutorId);
     }

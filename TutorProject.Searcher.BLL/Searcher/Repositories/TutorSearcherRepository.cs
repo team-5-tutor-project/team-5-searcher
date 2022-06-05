@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
 
-namespace TutorProject.Searcher.BLL.Repositories;
+namespace TutorProject.Searcher.BLL.Searcher.Repositories;
 
 public class TutorSearcherRepository
 {

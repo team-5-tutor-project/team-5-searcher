@@ -1,6 +1,6 @@
 using TutorProject.Account.Common.Models;
 
-namespace TutorProject.Searcher.BLL.Services;
+namespace TutorProject.Searcher.BLL.Searcher.Services;
 
 public interface ITutorSearcherService
 {

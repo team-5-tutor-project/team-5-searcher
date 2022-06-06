@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
 using TutorProject.Searcher.BLL.TutorSchedule.Services;
@@ -73,5 +74,45 @@ public class TutorScheduleController : ControllerBase
             throw new Exception(BadRequest().ToString());
         }
         return result;
+    }
+
+    [HttpDelete("{tutorId}/setAllTimeTaken")]
+    public async Task<Schedule> SetAllTimeTaken(Guid tutorId)
+    {
+        var result = await _service.SetAllTimeTaken(tutorId);
+
+        if (result == null)
+        {
+            throw new Exception(BadRequest().ToString());
+        }
+        return result;
+    }
+    
+    [HttpDelete("{tutorId}/setTimeTaken")]
+    public async Task<Schedule> SetTimeTaken(
+        Guid tutorId, 
+        [FromQuery] DayOfWeek dayOfWeek,
+        [FromQuery] int lessonNumber
+        )
+    {
+        var result = await _service.SetTimeTaken(tutorId, dayOfWeek, lessonNumber);
+
+        if (result == null)
+        {
+            throw new Exception(BadRequest().ToString());
+        }
+        
+        return result;
+    }
+    
+    [HttpDelete("{tutorId}/deleteSchedule")]
+    public async Task<IActionResult> DeleteSchedule(Guid tutorId)
+    {
+        if (await _service.DeleteSchedule(tutorId))
+        {
+            return Ok();
+        }
+        
+        return StatusCode((int) HttpStatusCode.BadRequest);
     }
 }

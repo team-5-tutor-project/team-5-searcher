@@ -49,8 +49,21 @@ public class DataSyncRepository
                Tutor = tutor,
                Subject = subject
            };
-            
             await _context.TutorToSubjects.AddAsync(tutorToSubject);
+            
+            var newSchedule = new Schedule
+            {
+                Id = Guid.NewGuid(),
+                Tutor = tutor
+            };
+
+            for (int j = 0; j < 7; j++)
+            {
+                newSchedule.FreeTimeSchedule.Add(new Day());
+            } 
+        
+            await _context.Schedules.AddAsync(newSchedule);
+            
             await _context.SaveChangesAsync();
         }
     }
@@ -60,6 +73,16 @@ public class DataSyncRepository
         foreach (var tutorToSubject in _context.TutorToSubjects)
         {
             _context.TutorToSubjects.Remove(tutorToSubject);
+        }
+
+        foreach (var day in _context.Days)
+        {
+            _context.Days.Remove(day);
+        }
+        
+        foreach (var schedule in _context.Schedules)
+        {
+             _context.Schedules.Remove(schedule);
         }
         
         foreach (var tutor in _context.Tutors)
@@ -71,6 +94,8 @@ public class DataSyncRepository
         {
             _context.Subjects.Remove(subject);
         }
+
+        
         await _context.SaveChangesAsync();
     }
 }

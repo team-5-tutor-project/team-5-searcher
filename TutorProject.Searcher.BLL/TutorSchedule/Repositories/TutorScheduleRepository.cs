@@ -129,12 +129,13 @@ public class TutorScheduleRepository
 
         if (schedule == null)
             return false;
-
-        foreach (var day in schedule.FreeTimeSchedule.Where(day => _context.Days.SingleOrDefaultAsync(x => x == day) is not null))
-        {
-            _context.Days.Remove(day);
-        }
+        
         _context.Schedules.Remove(schedule);
+
+        for (int i = 0; i < schedule.FreeTimeSchedule.Count; i++)
+        {
+            _context.Days.Remove(schedule.FreeTimeSchedule[i]);
+        }
         
         await _context.SaveChangesAsync();
 

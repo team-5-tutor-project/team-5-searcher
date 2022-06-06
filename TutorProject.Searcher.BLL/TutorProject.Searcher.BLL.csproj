@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="DataSync" />
       <Folder Include="Searcher" />
     </ItemGroup>
 

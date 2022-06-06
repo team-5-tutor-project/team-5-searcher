@@ -9,4 +9,7 @@ public interface ITutorScheduleService
     Task<Schedule> SetAllTimeFree(Guid tutorId);
     Task<List<Schedule>> GetAllSchedules();
     Task<Schedule> GetTutorSchedule(Guid tutorId);
+    Task<Schedule> SetAllTimeTaken(Guid tutorId);
+    Task<Schedule> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber);
+    Task<bool> DeleteSchedule(Guid tutorId);
 }

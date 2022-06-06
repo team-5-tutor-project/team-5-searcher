@@ -17,7 +17,7 @@ public class TutorScheduleRepository
             .Load();
     }
 
-    public async Task<Schedule?> AddSchedule(Guid tutorId)
+    public async Task<Schedule> AddSchedule(Guid tutorId)
     {
         var existingSchedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
 
@@ -35,8 +35,8 @@ public class TutorScheduleRepository
         for (int i = 0; i < 7; i++)
         {
             newSchedule.FreeTimeSchedule.Add(new Day());
-            newSchedule.FreeTimeSchedule[i].DayOfWeek = (DayOfWeek) i;
-        }
+        } 
+        
         await _context.AddAsync(newSchedule);
         await _context.SaveChangesAsync();
 
@@ -87,5 +87,57 @@ public class TutorScheduleRepository
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 
         return schedule;
+    }
+
+    public async Task<Schedule> SetAllTimeTaken(Guid tutorId)
+    {
+        var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
+
+        if (schedule == null)
+            return null;
+        
+        foreach (var day in schedule.FreeTimeSchedule)
+        {
+            for (int i = 0; i < day.DaySchedule.Count; i++)
+            {
+                day.DaySchedule[i] = false;
+            }
+        }
+        
+        await _context.SaveChangesAsync();
+
+        return schedule;
+    }
+    
+    public async Task<Schedule> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    {
+        var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
+
+        if (schedule == null)
+            return null;
+        
+        schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = false;
+        
+        await _context.SaveChangesAsync();
+
+        return schedule;
+    }
+
+    public async Task<bool> DeleteSchedule(Guid tutorId)
+    {
+        var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
+
+        if (schedule == null)
+            return false;
+
+        foreach (var day in schedule.FreeTimeSchedule.Where(day => _context.Days.SingleOrDefaultAsync(x => x == day) is not null))
+        {
+            _context.Days.Remove(day);
+        }
+        _context.Schedules.Remove(schedule);
+        
+        await _context.SaveChangesAsync();
+
+        return true;
     }
 }

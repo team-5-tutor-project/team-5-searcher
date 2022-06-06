@@ -37,4 +37,19 @@ public class TutorScheduleService : ITutorScheduleService
     {
         return await _repository.GetTutorSchedule(tutorId);
     }
+
+    public async Task<Schedule> SetAllTimeTaken(Guid tutorId)
+    {
+        return await _repository.SetAllTimeTaken(tutorId);
+    }
+
+    public async Task<bool> DeleteSchedule(Guid tutorId)
+    {
+        return await _repository.DeleteSchedule(tutorId);
+    }
+    
+    public async Task<Schedule> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    {
+        return await _repository.SetTimeTaken(tutorId, dayOfWeek, lessonNumber);
+    }
 }

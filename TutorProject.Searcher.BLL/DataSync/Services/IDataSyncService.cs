@@ -2,6 +2,8 @@
 
 public interface IDataSyncService
 {
-    Task PostData(int numOfTutors);
+    Task PostNewTutors(int numOfTutors);
+    Task PostNewClients(int numOfClients);
+    
     Task DeleteData();
 }

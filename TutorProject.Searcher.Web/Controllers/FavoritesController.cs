@@ -37,4 +37,16 @@ public class FavoritesController : ControllerBase
         
         return StatusCode((int) HttpStatusCode.BadRequest);
     }
+
+    [HttpGet("{clientId}/getTutorsFromFavorites")]
+    public async Task<IActionResult> GetTutorsFromFavorites(Guid clientId)
+    {
+        var tutors = await _service.GetTutorsFromFavorites(clientId);
+        if (tutors.Count != 0)
+        {
+            return Ok(tutors);
+        }
+
+        return NotFound();
+    }
 }

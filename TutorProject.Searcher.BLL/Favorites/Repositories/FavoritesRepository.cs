@@ -55,4 +55,10 @@ public class FavoritesRepository
         
         return true;
     }
+
+    public async Task<List<Account.Common.Models.Favorites>> GetTutorsFromFavorites(Guid clientId)
+    {
+        return await _context.Favorites.Where(ctt => ctt.Client.Id == clientId)
+            .ToListAsync();
+    }
 }

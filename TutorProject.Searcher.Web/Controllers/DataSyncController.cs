@@ -15,10 +15,18 @@ public class DataSyncController : ControllerBase
         _service = new DataSyncService(context);
     }
 
-    [HttpPost("createData")]
-    public async Task PostData([FromQuery] int numOfTutors)
+    [HttpPost("createNewTutors")]
+    public async Task<IActionResult> PostNewTutors([FromQuery] int numOfTutors)
     {
-        await _service.PostData(numOfTutors);
+        await _service.PostNewTutors(numOfTutors);
+        return Ok();
+    }
+    
+    [HttpPost("createNewClients")]
+    public async Task<IActionResult> PostNewClients([FromQuery] int numOfClients)
+    {
+        await _service.PostNewClients(numOfClients);
+        return Ok();
     }
     
     [HttpDelete("deleteData")]

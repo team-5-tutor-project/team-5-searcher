@@ -12,9 +12,14 @@ public class DataSyncService : IDataSyncService
         _repository = new DataSyncRepository(context);
     }
 
-    public async Task PostData(int numOfTutors)
+    public async Task PostNewTutors(int numOfTutors)
     {
-        await _repository.PostData(numOfTutors);
+        await _repository.PostNewTutors(numOfTutors);
+    }
+    
+    public async Task PostNewClients(int numOfClients)
+    {
+        await _repository.PostNewClients(numOfClients);
     }
 
     public async Task DeleteData()

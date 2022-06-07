@@ -10,6 +10,7 @@ public class DataSyncRepository
     private readonly Random _random = new();
     private readonly WorkFormat[] _workFormatValues = Enum.GetValues(typeof(WorkFormat)).Cast<WorkFormat>().ToArray();
     private readonly string[] _tutorsNames = {"Sofia", "Svetlana", "Julia", "Alisa", "Valeria", "Alexandra", "Alexei"};
+    private readonly string[] _clientsNames = {"Arina", "Milana", "Vera", "Diana", "Elena", "Karina", "Pavel"};
     private readonly string[] _subjectsNames = {"Math", "Informatics", "Python", "Pascal", "Robotics"};
 
     public DataSyncRepository(TutorContext context)
@@ -21,7 +22,7 @@ public class DataSyncRepository
             .Load();
     }
     
-    public async Task PostData(int numOfTutors)
+    public async Task PostNewTutors(int numOfTutors)
     {
         for (int i = 0; i < numOfTutors; i++)
         {
@@ -60,10 +61,33 @@ public class DataSyncRepository
             for (int j = 0; j < 7; j++)
             {
                 newSchedule.FreeTimeSchedule.Add(new Day());
-            } 
-        
+            }
+
+            if (_random.Next(2) == 1)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    newSchedule.FreeTimeSchedule[_random.Next(0, 6)].DaySchedule[_random.Next(0, 11)] = true;
+                }
+            }
+            
             await _context.Schedules.AddAsync(newSchedule);
             
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task PostNewClients(int numOfClients)
+    {
+        for (int i = 0; i < numOfClients; i++)
+        {
+            var client = new Client
+            {
+                Id = Guid.NewGuid(),
+                Name = _clientsNames[_random.Next(_clientsNames.Length)]
+            };
+            await _context.Clients.AddAsync(client);
+        
             await _context.SaveChangesAsync();
         }
     }
@@ -93,6 +117,11 @@ public class DataSyncRepository
         foreach (var subject in _context.Subjects)
         {
             _context.Subjects.Remove(subject);
+        }
+
+        foreach (var client in _context.Clients)
+        {
+            _context.Clients.Remove(client);
         }
 
         

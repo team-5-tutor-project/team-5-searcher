@@ -61,8 +61,16 @@ public class DataSyncRepository
             for (int j = 0; j < 7; j++)
             {
                 newSchedule.FreeTimeSchedule.Add(new Day());
-            } 
-        
+            }
+
+            if (_random.Next(2) == 1)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    newSchedule.FreeTimeSchedule[_random.Next(0, 6)].DaySchedule[_random.Next(0, 11)] = true;
+                }
+            }
+            
             await _context.Schedules.AddAsync(newSchedule);
             
             await _context.SaveChangesAsync();

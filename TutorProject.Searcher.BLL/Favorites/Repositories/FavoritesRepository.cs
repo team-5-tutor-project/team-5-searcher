@@ -21,8 +21,10 @@ public class FavoritesRepository
     {
         var client = await _context.Clients.SingleOrDefaultAsync(cl => cl.Id == clientId);
         var tutor = await _context.Tutors.SingleOrDefaultAsync(t => t.Id == tutorId);
+        var clientToTutor = await _context.Favorites.SingleOrDefaultAsync(ctt =>
+            ctt.Client.Id == clientId && ctt.Tutor.Id == tutorId);
 
-        if (client == null || tutor == null)
+        if (client == null || tutor == null || clientToTutor != null)
         {
             return false;
         }

@@ -56,4 +56,10 @@ public class BlacklistRepository
         
         return true;
     }
+    
+    public async Task<List<Account.Common.Models.Blacklist>> GetTutorsFromBlacklist(Guid clientId)
+    {
+        return await _context.Blacklist.Where(ctt => ctt.Client.Id == clientId)
+            .ToListAsync();
+    }
 }

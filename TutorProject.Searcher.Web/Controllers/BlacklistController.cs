@@ -37,4 +37,16 @@ public class BlacklistController : ControllerBase
         
         return StatusCode((int) HttpStatusCode.BadRequest);
     }
+    
+    [HttpGet("{clientId}/getTutorsFromBlacklist")]
+    public async Task<IActionResult> GetTutorsFromBlacklist(Guid clientId)
+    {
+        var tutors = await _service.GetTutorsFromBlacklist(clientId);
+        if (tutors.Count != 0)
+        {
+            return Ok(tutors);
+        }
+
+        return NotFound();
+    }
 }

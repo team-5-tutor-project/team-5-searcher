@@ -1,4 +1,5 @@
 using TutorProject.Account.Common;
+using TutorProject.Account.Common.Models;
 using TutorProject.Searcher.BLL.Blacklist.Repositories;
 
 namespace TutorProject.Searcher.BLL.Blacklist.Services;
@@ -20,5 +21,17 @@ public class BlacklistService : IBlacklistService
     public async Task<bool> DeleteTutorFromBlacklist(Guid clientId, Guid tutorId)
     {
         return await _repository.DeleteTutorFromBlacklist(clientId, tutorId);
+    }
+    
+    public async Task<List<Tutor>> GetTutorsFromBlacklist(Guid clientId)
+    {
+        var clientToTutor = await _repository.GetTutorsFromBlacklist(clientId);
+        var tutors = new List<Tutor>();
+        foreach (var clientTutor in clientToTutor)
+        {
+            tutors.Add(clientTutor.Tutor);
+        }
+
+        return tutors;
     }
 }

@@ -20,6 +20,13 @@ public class TutorSearcherRepository
     {
         return await _context.Tutors.ToListAsync();
     }
+    
+    public async Task<Account.Common.Models.Blacklist?> CheckInBlacklist(Guid clientId, Guid tutorId)
+    {
+        return await _context.Blacklist.SingleOrDefaultAsync(ctt => ctt.Client.Id == clientId
+                                                                    && ctt.Tutor.Id == tutorId);
+    }
+    
     public async Task<List<TutorToSubject>> Search(string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
     {
         minPrice ??= 0;

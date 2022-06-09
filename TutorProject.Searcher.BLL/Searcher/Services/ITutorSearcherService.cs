@@ -4,8 +4,8 @@ namespace TutorProject.Searcher.BLL.Searcher.Services;
 
 public interface ITutorSearcherService
 {
-    Task<List<Tutor>> GetAll();
+    Task<List<Tutor>> GetAll(Guid clientId);
 
-    Task<List<TutorToSubject>> Search(string? subject, WorkFormat? workFormat, int? minPrice,
+    Task<List<Tutor>> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice,
         int? maxPrice, int? pupilClass);
 }

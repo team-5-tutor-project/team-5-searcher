@@ -16,16 +16,27 @@ public class TutorSearcherController : ControllerBase
         _service = new TutorSearcherService(context);
     }
     
-    [HttpGet("getAllTutors")]
-    public async Task<List<Tutor>> GetAll()
+    [HttpGet("{clientId}/getAllTutors")]
+    public async Task<IActionResult> GetAll(Guid clientId)
     {
-        return await _service.GetAll();
+        var tutors = await _service.GetAll(clientId);
+        
+        if (tutors.Count != 0)
+        {
+            return Ok(tutors);
+        }
+        return NotFound();
     }
     
-    [HttpGet("search")]
-    public async Task<List<TutorToSubject>> Search(string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
+    [HttpGet("{clientId}/search")]
+    public async Task<IActionResult> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
     {
-        var tutors = await _service.Search( subject, workFormat, minPrice, maxPrice, pupilClass);
-        return tutors;
+        var tutors = await _service.Search(clientId, subject, workFormat, minPrice, maxPrice, pupilClass);
+
+        if (tutors.Count != 0)
+        {
+            return Ok(tutors);
+        }
+        return NotFound();
     }
 }

@@ -29,9 +29,11 @@ public class TutorSearcherController : ControllerBase
     }
     
     [HttpGet("{clientId}/search")]
-    public async Task<IActionResult> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice, int? maxPrice, int? pupilClass)
+    public async Task<IActionResult> Search(Guid clientId, [FromQuery] string? subject,
+        [FromQuery] WorkFormat? workFormat, [FromQuery] int? minPrice, [FromQuery] int? maxPrice,
+        [FromQuery] int? pupilClass, [FromQuery] List<bool>? schedule)
     {
-        var tutors = await _service.Search(clientId, subject, workFormat, minPrice, maxPrice, pupilClass);
+        var tutors = await _service.Search(clientId, subject, workFormat, minPrice, maxPrice, pupilClass, schedule);
 
         if (tutors.Count != 0)
         {

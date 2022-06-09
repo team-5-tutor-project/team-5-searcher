@@ -7,5 +7,5 @@ public interface ITutorSearcherService
     Task<List<Tutor>> GetAll(Guid clientId);
 
     Task<List<Tutor>> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice,
-        int? maxPrice, int? pupilClass);
+        int? maxPrice, int? pupilClass, List<bool>? schedule);
 }

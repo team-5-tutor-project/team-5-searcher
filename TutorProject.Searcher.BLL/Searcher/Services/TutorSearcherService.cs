@@ -9,24 +9,32 @@ namespace TutorProject.Searcher.BLL.Searcher.Services;
 public class TutorSearcherService : ITutorSearcherService
 {
     private readonly TutorSearcherRepository _repository;
-    private readonly BlacklistRepository _blacklistRepository;
     private readonly TutorScheduleRepository _scheduleRepository;
 
     public TutorSearcherService(TutorContext context)
     {
         _repository = new TutorSearcherRepository(context);
-        _blacklistRepository = new BlacklistRepository(context);
         _scheduleRepository = new TutorScheduleRepository(context);
     }
 
     public async Task<List<Tutor>> GetAll(Guid clientId)
     {
         var tutors = await _repository.GetAll();
-        var black = await  _blacklistRepository.GetTutorsFromBlacklist(clientId);
-        foreach (var clientTutor in black)
+        var tutorsToRemove = new List<Tutor>();
+        
+        foreach (var tutor in tutors)
         {
-            tutors.Remove(clientTutor.Tutor);
+            if (await CheckInBlacklist(clientId, tutor.Id) || !await CheckSchedule(tutor.Id, null))
+            {
+                tutorsToRemove.Add(tutor);
+            }
         }
+        
+        foreach (var tutor in tutorsToRemove)
+        {
+            tutors.Remove(tutor);
+        }
+        
         return tutors;
     }
 
@@ -43,6 +51,19 @@ public class TutorSearcherService : ITutorSearcherService
     private async Task<bool> CheckSchedule(Guid tutorId, List<bool>? schedule)
     {
         var tutorSchedule = await _scheduleRepository.GetTutorSchedule(tutorId);
+
+        for (int i = 0; i < tutorSchedule.FreeTimeSchedule.Count; i++)
+        {
+            if (tutorSchedule.FreeTimeSchedule[i].DaySchedule.Contains(true))
+            {
+                break;
+            }
+
+            if (i == tutorSchedule.FreeTimeSchedule.Count - 1)
+            {
+                return false;
+            }
+        }
         if (schedule == null || !schedule.Contains(true))
         {
             return true;

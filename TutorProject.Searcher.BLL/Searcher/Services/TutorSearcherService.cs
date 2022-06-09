@@ -22,10 +22,7 @@ public class TutorSearcherService : ITutorSearcherService
         var black = await  _blacklistRepository.GetTutorsFromBlacklist(clientId);
         foreach (var clientTutor in black)
         {
-            if (tutors.Contains(clientTutor.Tutor))
-            {
-                tutors.Remove(clientTutor.Tutor);
-            }
+            tutors.Remove(clientTutor.Tutor);
         }
         return tutors;
     }

@@ -81,9 +81,9 @@ public class TutorSearcherService : ITutorSearcherService
     }
     
     public async Task<List<Tutor>> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice,
-        int? maxPrice, int? pupilClass, List<bool>? schedule)
+        int? maxPrice, int? pupilClass, List<bool>? schedule, TutorsOrder? tutorsOrder)
     {
-        var tutorsToSubject = await _repository.Search(subject, workFormat, minPrice, maxPrice, pupilClass);
+        var tutorsToSubject = await _repository.Search(subject, workFormat, minPrice, maxPrice, pupilClass, tutorsOrder);
         var tutors = new List<Tutor>();
         foreach (var tutorToSubj in tutorsToSubject)
         {

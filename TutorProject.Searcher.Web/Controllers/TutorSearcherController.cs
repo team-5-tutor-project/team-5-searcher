@@ -1,8 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
-using TutorProject.Account.Common.Models;
+using TutorProject.Searcher.BLL.Data;
+using TutorProject.Searcher.BLL.Results;
 using TutorProject.Searcher.BLL.Searcher.Services;
+using TutorProject.Searcher.Web.Dto;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
@@ -26,22 +28,22 @@ public class TutorSearcherController : ControllerBase
         
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
         return NotFound();
     }
     
     [HttpGet("{clientId}/search")]
-    public async Task<IActionResult> Search(Guid clientId, [FromQuery] string? subject,
-        [FromQuery] WorkFormat? workFormat, [FromQuery] int? minPrice, [FromQuery] int? maxPrice,
-        [FromQuery] int? pupilClass, [FromQuery] List<bool>? schedule)
+    public async Task<IActionResult> Search(Guid clientId, [FromBody] SearcherDto searcherDto)
     {
-        var tutors = await _service.Search(clientId, subject, workFormat, minPrice, maxPrice, pupilClass, schedule);
+        var searcherData = _mapper.Map<SearcherData>(searcherDto);
+        var tutors = await _service.Search(clientId, searcherData);
 
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
+        
         return NotFound();
     }
 }

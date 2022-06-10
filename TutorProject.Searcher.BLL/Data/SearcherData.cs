@@ -9,4 +9,5 @@ public class SearcherData
     public int? MaxPrice { get; set; }
     public int? PupilClass { get; set; }
     public List<bool>? Schedule { get; set; } 
+    public TutorsOrder? TutorsOrder { get; set; }
 }

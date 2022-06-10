@@ -1,8 +1,6 @@
 using TutorProject.Account.Common;
 using TutorProject.Account.Common.Models;
 using TutorProject.Searcher.BLL.Blacklist.Repositories;
-using TutorProject.Searcher.BLL.Data;
-using TutorProject.Searcher.BLL.Results;
 using TutorProject.Searcher.BLL.Searcher.Repositories;
 using TutorProject.Searcher.BLL.TutorSchedule.Repositories;
 
@@ -82,21 +80,16 @@ public class TutorSearcherService : ITutorSearcherService
         return false;
     }
     
-    public async Task<List<Tutor>> Search(Guid clientId, SearcherData searcherData)
+    public async Task<List<Tutor>> Search(Guid clientId, string? subject, WorkFormat? workFormat, int? minPrice,
+        int? maxPrice, int? pupilClass, List<bool>? schedule)
     {
-        var tutorsToSubject = await _repository.Search(
-            searcherData.Subject?.Name, 
-            searcherData.WorkFormat, 
-            searcherData.MinPrice, 
-            searcherData.MaxPrice, 
-            searcherData.PupilClass);
-        
+        var tutorsToSubject = await _repository.Search(subject, workFormat, minPrice, maxPrice, pupilClass);
         var tutors = new List<Tutor>();
         foreach (var tutorToSubj in tutorsToSubject)
         {
             if (!await CheckInBlacklist(clientId, tutorToSubj.Tutor.Id) &&
                 !tutors.Contains(tutorToSubj.Tutor) &&
-                await CheckSchedule(tutorToSubj.Tutor.Id, searcherData.Schedule))
+                await CheckSchedule(tutorToSubj.Tutor.Id, schedule))
             {
                 tutors.Add(tutorToSubj.Tutor);
             }

@@ -1,7 +1,9 @@
 using System.Net;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
 using TutorProject.Searcher.BLL.Favorites.Services;
+using TutorProject.Searcher.BLL.Results;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
@@ -10,10 +12,12 @@ namespace TutorProject.Searcher.Web.Controllers;
 public class FavoritesController : ControllerBase
 {
     private readonly IFavoritesService _service;
+    private readonly IMapper _mapper;
 
-    public FavoritesController(TutorContext context)
+    public FavoritesController(TutorContext context, IMapper mapper)
     {
         _service = new FavoritesService(context);
+        _mapper = mapper;
     }
     
     [HttpPost("{clientId}/addTutorToFavorites")]
@@ -44,7 +48,7 @@ public class FavoritesController : ControllerBase
         var tutors = await _service.GetTutorsFromFavorites(clientId);
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
 
         return NotFound();

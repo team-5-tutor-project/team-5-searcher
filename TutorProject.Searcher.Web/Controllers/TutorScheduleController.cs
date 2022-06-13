@@ -1,8 +1,10 @@
-﻿using System.Net;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
-using TutorProject.Account.Common.Models;
+using TutorProject.Searcher.BLL.Data;
+using TutorProject.Searcher.BLL.Results;
 using TutorProject.Searcher.BLL.TutorSchedule.Services;
+using TutorProject.Searcher.Web.Dto;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
@@ -11,98 +13,93 @@ namespace TutorProject.Searcher.Web.Controllers;
 public class TutorScheduleController : ControllerBase
 {
     private readonly ITutorScheduleService _service;
+    private readonly IMapper _mapper;
 
-    public TutorScheduleController(TutorContext context)
+    public TutorScheduleController(TutorContext context, IMapper mapper)
     {
         _service = new TutorScheduleService(context);
+        _mapper = mapper;
     }
 
     [HttpPost("addSchedule")]
-    public async Task<Schedule> AddSchedule([FromQuery] Guid tutorId)
+    public async Task<IActionResult> AddSchedule([FromQuery] Guid tutorId)
     {
         var result = await _service.AddSchedule(tutorId);
         
         if (result == null)
         {
-            throw new Exception(BadRequest().ToString());
+            NotFound();
         }
         
-        return result;
+        return Ok(_mapper.Map<List<ScheduleResult>>(result));
     }
     
     [HttpPut("{tutorId}/addFreeTime")]
-    public async Task<Schedule> AddFreeTime(Guid tutorId, 
-        [FromQuery] DayOfWeek dayOfWeek,
-        [FromQuery] int lessonNumber)
+    public async Task<IActionResult> AddFreeTime(Guid tutorId, 
+        [FromBody] ScheduleDto scheduleDto)
     {
-        var result = await _service.AddFreeTime(tutorId, dayOfWeek, lessonNumber);
+        var scheduleData = _mapper.Map<ScheduleData>(scheduleDto);
+        var result = await _service.AddFreeTime(tutorId, scheduleData);
         
         if (result == null)
         {
-            throw new Exception(BadRequest().ToString());
+            NotFound();
         }
         
-        return result;
+        return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
     [HttpPut("{tutorId}/setAllTimeFree")]
-    public async Task<Schedule> AddFreeTime(Guid tutorId)
+    public async Task<IActionResult> AddFreeTime(Guid tutorId)
     {
         var result = await _service.SetAllTimeFree(tutorId);
-        
+
         if (result == null)
-        {
-            throw new Exception(BadRequest().ToString());
-        }
-        
-        return result;
-    }
-    
-    [HttpGet("getAllSchedules")]
-    public async Task<List<Schedule>> GetAll()
-    {
-        return await _service.GetAllSchedules();
+            return NotFound();
+
+        return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
     [HttpGet("{tutorId}/getSchedule")]
-    public async Task<Schedule> GetTutorSchedule(Guid tutorId)
+    public async Task<IActionResult> GetTutorSchedule(Guid tutorId)
     {
         var result = await _service.GetTutorSchedule(tutorId);
 
         if (result == null)
         {
-            throw new Exception(BadRequest().ToString());
+            NotFound();
         }
-        return result;
+        
+        return Ok(_mapper.Map<ScheduleResult>(result));
     }
 
     [HttpDelete("{tutorId}/setAllTimeTaken")]
-    public async Task<Schedule> SetAllTimeTaken(Guid tutorId)
+    public async Task<IActionResult> SetAllTimeTaken(Guid tutorId)
     {
         var result = await _service.SetAllTimeTaken(tutorId);
 
         if (result == null)
         {
-            throw new Exception(BadRequest().ToString());
+            NotFound();
         }
-        return result;
+        
+        return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
     [HttpDelete("{tutorId}/setTimeTaken")]
-    public async Task<Schedule> SetTimeTaken(
+    public async Task<IActionResult> SetTimeTaken(
         Guid tutorId, 
-        [FromQuery] DayOfWeek dayOfWeek,
-        [FromQuery] int lessonNumber
-        )
+        [FromBody] ScheduleDto scheduleDto)
     {
-        var result = await _service.SetTimeTaken(tutorId, dayOfWeek, lessonNumber);
+        var scheduleData = _mapper.Map<ScheduleData>(scheduleDto);
+        var result = await _service.SetTimeTaken(tutorId, scheduleData);
 
         if (result == null)
         {
-            throw new Exception(BadRequest().ToString());
+            NotFound();
         }
         
-        return result;
+        return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
     [HttpDelete("{tutorId}/deleteSchedule")]
@@ -113,6 +110,6 @@ public class TutorScheduleController : ControllerBase
             return Ok();
         }
         
-        return StatusCode((int) HttpStatusCode.BadRequest);
+        return NotFound();
     }
 }

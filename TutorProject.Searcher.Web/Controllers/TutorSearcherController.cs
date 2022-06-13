@@ -1,7 +1,10 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
-using TutorProject.Account.Common.Models;
+using TutorProject.Searcher.BLL.Data;
+using TutorProject.Searcher.BLL.Results;
 using TutorProject.Searcher.BLL.Searcher.Services;
+using TutorProject.Searcher.Web.Dto;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
@@ -10,10 +13,12 @@ namespace TutorProject.Searcher.Web.Controllers;
 public class TutorSearcherController : ControllerBase
 {
     private readonly ITutorSearcherService _service;
-
-    public TutorSearcherController(TutorContext context)
+    private readonly IMapper _mapper;
+ 
+    public TutorSearcherController(TutorContext context, IMapper mapper)
     {
         _service = new TutorSearcherService(context);
+        _mapper = mapper;
     }
     
     [HttpGet("{clientId}/getAllTutors")]
@@ -23,22 +28,22 @@ public class TutorSearcherController : ControllerBase
         
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
         return NotFound();
     }
     
     [HttpGet("{clientId}/search")]
-    public async Task<IActionResult> Search(Guid clientId, [FromQuery] string? subject,
-        [FromQuery] WorkFormat? workFormat, [FromQuery] int? minPrice, [FromQuery] int? maxPrice,
-        [FromQuery] int? pupilClass, [FromQuery] List<bool>? schedule, [FromQuery] TutorsOrder? tutorsOrder)
+    public async Task<IActionResult> Search(Guid clientId, [FromQuery] SearcherDto searcherDto)
     {
-        var tutors = await _service.Search(clientId, subject, workFormat, minPrice, maxPrice, pupilClass, schedule, tutorsOrder);
+        var searcherData = _mapper.Map<SearcherData>(searcherDto);
+        var tutors = await _service.Search(clientId, searcherData);
 
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
+        
         return NotFound();
     }
 }

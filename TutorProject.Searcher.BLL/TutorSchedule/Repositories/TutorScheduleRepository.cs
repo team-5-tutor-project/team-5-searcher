@@ -17,7 +17,7 @@ public class TutorScheduleRepository
             .Load();
     }
 
-    public async Task<Schedule> AddSchedule(Guid tutorId)
+    public async Task<Schedule?> AddSchedule(Guid tutorId)
     {
         var existingSchedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
 
@@ -43,7 +43,7 @@ public class TutorScheduleRepository
         return newSchedule;
     }
 
-    public async Task<Schedule> SetAllTimeFree(Guid tutorId)
+    public async Task<Schedule?> SetAllTimeFree(Guid tutorId)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
         
@@ -63,7 +63,7 @@ public class TutorScheduleRepository
         return schedule;
     }
 
-    public async Task<Schedule> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule?> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
 
@@ -76,20 +76,15 @@ public class TutorScheduleRepository
         
         return schedule;
     }
-    
-    public async Task<List<Schedule>> GetAllSchedules()
-    {
-        return await _context.Schedules.ToListAsync();
-    }
-    
-    public async Task<Schedule> GetTutorSchedule(Guid tutorId)
+
+    public async Task<Schedule?> GetTutorSchedule(Guid tutorId)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
-
+        
         return schedule;
     }
 
-    public async Task<Schedule> SetAllTimeTaken(Guid tutorId)
+    public async Task<Schedule?> SetAllTimeTaken(Guid tutorId)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 
@@ -109,7 +104,7 @@ public class TutorScheduleRepository
         return schedule;
     }
     
-    public async Task<Schedule> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule?> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 

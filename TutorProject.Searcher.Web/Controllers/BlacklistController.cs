@@ -1,7 +1,9 @@
 using System.Net;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using TutorProject.Account.Common;
 using TutorProject.Searcher.BLL.Blacklist.Services;
+using TutorProject.Searcher.BLL.Results;
 
 namespace TutorProject.Searcher.Web.Controllers;
 
@@ -10,10 +12,12 @@ namespace TutorProject.Searcher.Web.Controllers;
 public class BlacklistController : ControllerBase
 {
     private readonly IBlacklistService _service;
+    private readonly IMapper _mapper;
 
-    public BlacklistController(TutorContext context)
+    public BlacklistController(TutorContext context, IMapper mapper)
     {
         _service = new BlacklistService(context);
+        _mapper = mapper;
     }
     
     [HttpPost("{clientId}/addTutorToBlacklist")]
@@ -44,7 +48,7 @@ public class BlacklistController : ControllerBase
         var tutors = await _service.GetTutorsFromBlacklist(clientId);
         if (tutors.Count != 0)
         {
-            return Ok(tutors);
+            return Ok(_mapper.Map<List<TutorResult>>(tutors));
         }
 
         return NotFound();

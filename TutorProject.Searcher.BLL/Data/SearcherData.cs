@@ -3,7 +3,7 @@ namespace TutorProject.Searcher.BLL.Data;
 
 public class SearcherData
 {
-    public Subject? Subject { get; set; }
+    public string? Subject { get; set; }
     public WorkFormat? WorkFormat { get; set; }
     public int? MinPrice { get; set; }
     public int? MaxPrice { get; set; }

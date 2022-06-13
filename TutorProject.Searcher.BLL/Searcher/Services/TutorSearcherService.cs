@@ -84,7 +84,7 @@ public class TutorSearcherService : ITutorSearcherService
     public async Task<List<Tutor>> Search(Guid clientId, SearcherData searcherData)
     {
         var tutorsToSubject = await _repository.Search(
-            searcherData.Subject?.Name,
+            searcherData.Subject,
             searcherData.WorkFormat,
             searcherData.MinPrice,
             searcherData.MaxPrice,

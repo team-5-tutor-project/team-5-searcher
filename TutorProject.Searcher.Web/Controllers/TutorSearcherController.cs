@@ -34,7 +34,7 @@ public class TutorSearcherController : ControllerBase
     }
     
     [HttpGet("{clientId}/search")]
-    public async Task<IActionResult> Search(Guid clientId, [FromBody] SearcherDto searcherDto)
+    public async Task<IActionResult> Search(Guid clientId, [FromQuery] SearcherDto searcherDto)
     {
         var searcherData = _mapper.Map<SearcherData>(searcherDto);
         var tutors = await _service.Search(clientId, searcherData);

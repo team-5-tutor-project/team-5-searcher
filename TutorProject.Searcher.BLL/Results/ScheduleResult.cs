@@ -4,8 +4,8 @@ namespace TutorProject.Searcher.BLL.Results;
 
 public class ScheduleResult
 {
-    public Tutor Tutor { get; init; }
+    public TutorResult Tutor { get; init; }
 
-    public List<Day> FreeTimeSchedule { get; init; } = new List<Day>();
+    public List<DayResult> FreeTimeSchedule { get; init; } = new List<DayResult>();
 }
 

@@ -14,5 +14,6 @@ public class AutomapperProfile : Profile
         CreateMap<ScheduleDto, ScheduleData>();
         CreateMap<Tutor, TutorResult>();
         CreateMap<Schedule, ScheduleResult>();
+        CreateMap<Day, DayResult>();
     }
 }

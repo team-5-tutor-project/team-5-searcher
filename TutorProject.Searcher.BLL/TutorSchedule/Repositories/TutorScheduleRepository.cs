@@ -76,12 +76,7 @@ public class TutorScheduleRepository
         
         return schedule;
     }
-    
-    public async Task<List<Schedule>?> GetAllSchedules()
-    {
-        return await _context.Schedules.ToListAsync();
-    }
-    
+
     public async Task<Schedule?> GetTutorSchedule(Guid tutorId)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);

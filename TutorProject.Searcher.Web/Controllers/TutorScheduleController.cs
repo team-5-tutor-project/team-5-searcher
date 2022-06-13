@@ -31,7 +31,7 @@ public class TutorScheduleController : ControllerBase
             NotFound();
         }
         
-        return Ok(_mapper.Map<ScheduleResult>(result));
+        return Ok(_mapper.Map<List<ScheduleResult>>(result));
     }
     
     [HttpPut("{tutorId}/addFreeTime")]
@@ -58,16 +58,6 @@ public class TutorScheduleController : ControllerBase
             return NotFound();
 
         return Ok(_mapper.Map<ScheduleResult>(result));
-    }
-    
-    [HttpGet("getAllSchedules")]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _service.GetAllSchedules();
-
-        if (result == null || result.Count == 0)
-            return NotFound();
-        return Ok(_mapper.Map<List<ScheduleResult>>(result));
     }
     
     [HttpGet("{tutorId}/getSchedule")]

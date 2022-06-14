@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\team-5-account\Back\TutorProject.Account.Common\TutorProject.Account.Common.csproj" />
+      <ProjectReference Include="..\..\..\team-5-account\Back\TutorProject.Account.Common\TutorProject.Account.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

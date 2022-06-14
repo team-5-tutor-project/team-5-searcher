@@ -21,6 +21,11 @@ public class TutorSearcherRepository
         return await _context.Tutors.ToListAsync();
     }
     
+    public async Task<List<TutorToSubject>> GetSubjectsForTutor(Guid tutorId)
+    {
+        return await _context.TutorToSubjects.Where(ts => ts.Tutor.Id == tutorId).ToListAsync();
+    }
+    
     public async Task<Account.Common.Models.Blacklist?> CheckInBlacklist(Guid clientId, Guid tutorId)
     {
         return await _context.Blacklist.SingleOrDefaultAsync(ctt => ctt.Client.Id == clientId

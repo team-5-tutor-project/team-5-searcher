@@ -39,6 +39,21 @@ public class TutorSearcherService : ITutorSearcherService
         return tutors;
     }
 
+    public async Task<List<string>> GetSubjectsForTutor(Guid tutorId)
+    {
+        var subjectsFromDb = await _repository.GetSubjectsForTutor(tutorId);
+        var subjects = new List<string>();
+        foreach (var subject in subjectsFromDb)
+        {
+            if (!subjects.Contains(subject.Subject.Name.ToLower()))
+            {
+                subjects.Add(subject.Subject.Name.ToLower());
+            }
+        }
+
+        return subjects;
+    }
+    
     private async Task<bool> CheckInBlacklist(Guid clientId, Guid tutorId)
     {
         var tutorBlacklist = await _repository.CheckInBlacklist(clientId, tutorId);

@@ -7,5 +7,7 @@ public interface ITutorSearcherService
 {
     Task<List<Tutor>> GetAll(Guid clientId);
 
+    Task<List<string>> GetSubjectsForTutor(Guid tutorId);
+
     Task<List<Tutor>> Search(Guid clientId, SearcherData searcherData);
 }

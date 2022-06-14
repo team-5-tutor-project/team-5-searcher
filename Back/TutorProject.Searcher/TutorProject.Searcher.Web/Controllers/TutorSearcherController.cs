@@ -33,6 +33,18 @@ public class TutorSearcherController : ControllerBase
         return NotFound();
     }
     
+    [HttpGet("{tutorId}/getAllSubjects")]
+    public async Task<IActionResult> GetSubjectsForTutor(Guid tutorId)
+    {
+        var subjects = await _service.GetSubjectsForTutor(tutorId);
+        
+        if (subjects.Count != 0)
+        {
+            return Ok(subjects);
+        }
+        return NotFound();
+    }
+    
     [HttpGet("{clientId}/search")]
     public async Task<IActionResult> Search(Guid clientId, [FromQuery] SearcherDto searcherDto)
     {

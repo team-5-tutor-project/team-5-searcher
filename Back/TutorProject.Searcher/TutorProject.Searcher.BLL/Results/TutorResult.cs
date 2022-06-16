@@ -4,6 +4,8 @@ namespace TutorProject.Searcher.BLL.Results;
 
 public class TutorResult
 {
+    public Guid Id { get; init; }
+    
     public string Name { get; init; }
     
     public WorkFormat WorkFormat { get; set; }

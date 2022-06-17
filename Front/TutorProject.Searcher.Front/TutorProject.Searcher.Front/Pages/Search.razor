@@ -71,22 +71,28 @@
             <th>Имя</th>
             <th>Формат работы</th>
             <th>Цена за час</th>
-            <th>Мин класс обучения</th>
-            <th>Макс класс обучения</th>
+            <th>Классы обучения</th>
+            <th>Предметы</th>
+            <th>Расписание</th>
+            <th>ЧС</th>
+            <th>Избранное</th>
         </tr>
         </thead>
         <tbody>
         @{
             System.Diagnostics.Debug.Assert(TutorsList != null, nameof(TutorsList) + " != null");
         }
-        @foreach (var tut in TutorsList)
+        @foreach (var tut in TutorsToShowList)
         {
             <tr>
-                <td>@tut.Name</td>
-                <td>@tut.WorkFormat</td>
-                <td>@tut.PricePerHour</td>
-                <td>@tut.PupilMinClass</td>
-                <td>@tut.PupilMaxClass</td>
+                <td>@tut.Tutor.Name</td>
+                <td>@tut.Tutor.WorkFormat</td>
+                <td>@tut.Tutor.PricePerHour</td>
+                <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
+                <td>@tut.Subjects</td>
+                <td><button class="btn btn-primary" @onclick="@(()=> NavToSchedule(@tut.Tutor.Id.ToString()))">расписание</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> AddToBlackList(@tut.Tutor.Id.ToString()))">чс</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> AddToFavourites(@tut.Tutor.Id.ToString()))">изб</button></td>
             </tr>
         }
         </tbody>
@@ -96,6 +102,7 @@
     public string ClientID { get; set; }
     private TutorToSearch? TutorToSearch { get; set; }
     public List<TutorResult>? TutorsList { get; set; }
+    public List<TutorToShow>? TutorsToShowList { get; set; }
     private string[]? Orders { get; set; }
     private string[]? Formats { get; set; }
     
@@ -105,10 +112,17 @@
         Orders = new[] {"RisingPrice", "DownwardPrice", ""};
         Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
         TutorsList = new List<TutorResult>();
+        TutorsToShowList = new List<TutorToShow>();
         ClientID = "12cbe563-a53d-477e-b8ba-9a1741d80567";
         
         var response = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
         TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        foreach (var tutor in TutorsList)
+        {
+            var resp = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
+            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+        }
     }
     
     private async Task SearchTutor()
@@ -157,5 +171,29 @@
         }
         var response = await Http.GetAsync(request);
         TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        TutorsToShowList = new List<TutorToShow>();
+        foreach (var tutor in TutorsList)
+        {
+            var resp = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
+            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+        }
+    }
+    
+    private void NavToSchedule(string tutorId)
+    {
+        NavigationManager.NavigateTo($"/search/schedule/{tutorId}");
+    }
+    
+    private async Task AddToBlackList(string tutorId)
+    {
+        //Uri uri = new Uri($"https://localhost:7263/blacklist/{ClientID}/addTutorToBlacklist");
+        
+        //await Http.PostAsync(uri,$"?tutorId={tutorId}");
+    }
+    
+    private async Task AddToFavourites(string tutorId)
+    {
+        //await Http.PostAsync($"https://localhost:7263/favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}");
     }
 }

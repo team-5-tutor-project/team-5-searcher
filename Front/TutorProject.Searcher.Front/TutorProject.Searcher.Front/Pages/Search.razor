@@ -30,21 +30,16 @@
         </div>
         <br />
         <div class="col-12 row">
+            <label class="col-2 font-weight-bold">класс обучения: </label>
+            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.PupilClass" />
+        </div>
+        <br />
+        <div class="col-12 row">
             <label class="col-2 font-weight-bold">формат работы: </label>
             <InputSelect @bind-Value="TutorToSearch.WorkFormat" class="form-check.control col-3">
                 @foreach (var format in Formats)
                 {
                     <option value="@format">@format</option>
-                }
-            </InputSelect>
-        </div>
-        <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">класс обучения: </label>
-            <InputSelect @bind-Value="TutorToSearch.PupilClass" class="form-check.control col-3">
-                @foreach (var cl in Classes)
-                {
-                    <option value="@cl">@cl</option>
                 }
             </InputSelect>
         </div>
@@ -98,27 +93,69 @@
 </table>
 
 @code {
-    public TutorToSearch TutorToSearch { get; set; }
+    public string ClientID { get; set; }
+    private TutorToSearch? TutorToSearch { get; set; }
     public List<TutorResult>? TutorsList { get; set; }
-    public string[] Orders { get; set; }
-    public string[] Formats { get; set; }
-    public int[] Classes { get; set; }
+    private string[]? Orders { get; set; }
+    private string[]? Formats { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
         TutorToSearch = new TutorToSearch();
-        Orders = new[] {"RisingPrice", "DownwardPrice"};
-        Formats = new[] {"Online", "ClientHome", "TutorHome"};
-        Classes = new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        Orders = new[] {"RisingPrice", "DownwardPrice", ""};
+        Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
         TutorsList = new List<TutorResult>();
+        ClientID = "12cbe563-a53d-477e-b8ba-9a1741d80567";
         
-        var response = await Http.GetAsync("https://localhost:7263/searcher/12cbe563-a53d-477e-b8ba-9a1741d80567/getAllTutors");
+        var response = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
         TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
     }
     
-    private void SearchTutor()
+    private async Task SearchTutor()
     {
-        
+        string request = $"https://localhost:7263/searcher/{ClientID}/getAllTutors";
+        if (TutorToSearch.Subject != "" || TutorToSearch.WorkFormat != "" 
+            || TutorToSearch.MinPrice != 0 || TutorToSearch.MaxPrice != 0 
+            || TutorToSearch.PupilClass != 0 || TutorToSearch.TutorsOrder != "")
+        {
+            bool isntFirst = false;
+            request = $"https://localhost:7263/searcher/{ClientID}/search?";
+            if (TutorToSearch.Subject != "")
+            {
+                request += $"Subject={TutorToSearch.Subject}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.WorkFormat != "")
+            {
+                if (isntFirst) request += "&";
+                request += $"WorkFormat={Array.IndexOf(Formats, TutorToSearch.WorkFormat)}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.MinPrice != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"MinPrice={TutorToSearch.MinPrice}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.MaxPrice != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"MaxPrice={TutorToSearch.MaxPrice}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.PupilClass != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"PupilClass={TutorToSearch.PupilClass}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.TutorsOrder != "")
+            {
+                if (isntFirst) request += "&";
+                request += $"TutorsOrder={Array.IndexOf(Orders, TutorToSearch.TutorsOrder)}";
+            }
+        }
+        var response = await Http.GetAsync(request);
+        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
     }
-    
 }

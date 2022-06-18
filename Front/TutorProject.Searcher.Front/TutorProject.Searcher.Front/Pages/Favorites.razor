@@ -1,8 +1,8 @@
 @page "/Favorites"
 @using Microsoft.AspNetCore.Components
 @using TutorProject.Searcher.Front.Models
-@inject NavigationManager NavigationManager
-@inject HttpClient Http
+@inject NavigationManager _navigationManager
+@inject HttpClient _http
 
 <PageTitle>Favorites</PageTitle>
 
@@ -17,6 +17,9 @@
             <th>Цена за час</th>
             <th>Классы обучения</th>
             <th>Предметы</th>
+            <th></th>
+            <th></th>
+            
         </tr>
         </thead>
         <tbody>
@@ -32,6 +35,8 @@
                 <td>@tut.Tutor.PricePerHour</td>
                 <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
                 <td>@tut.Subjects</td>
+                <td><button class="btn btn-primary" @onclick="@(()=> DeleteFromFavorites(tut.Tutor.Id))">delete</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> GoToChat())">chat</button></td>
             </tr>
         }
         </tbody>
@@ -40,21 +45,33 @@
 @code {
     private Guid ClientID { get; set; }
     private List<TutorResult>? TutorsList { get; set; }
-    public List<TutorToShow>? TutorsToShowList { get; set; }
+    private List<TutorToShow>? TutorsToShowList { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
-        ClientID = Guid.Parse("12cbe563-a53d-477e-b8ba-9a1741d80567");
+        ClientID = Guid.Parse("ec7052df-4928-4f42-a8a0-2cff0cb16dd3");
         TutorsList = new List<TutorResult>();
-        
-        var response = await Http.GetAsync($"https://localhost:7263/favorites/{ClientID}/getTutorsFromFavorites");
-        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         TutorsToShowList = new List<TutorToShow>();
+        
+        var response = await _http.GetAsync($"https://localhost:7263/favorites/{ClientID}/getTutorsFromFavorites");
+        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        
         foreach (var tutor in TutorsList)
         {
-            var resp = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            tutor.Description ??= "-";
+            var resp = await _http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
             var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
             TutorsToShowList.Add(new TutorToShow(tutor, subjects));
         }
+    }
+
+    private async Task DeleteFromFavorites(Guid tutorId)
+    {
+        await _http.DeleteAsync($"https://localhost:7263/favorites/{ClientID}/deleteTutorFromFavorites?tutorId={tutorId}");
+    }
+
+    private async Task GoToChat()
+    {
+        
     }
 }

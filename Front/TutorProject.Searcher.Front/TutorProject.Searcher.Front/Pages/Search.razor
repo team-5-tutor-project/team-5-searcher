@@ -1,4 +1,4 @@
-﻿@page "/Search"
+﻿@page "/Search/{token}"
 @using Microsoft.AspNetCore.Components
 @using Newtonsoft.Json;
 @using TutorProject.Searcher.Front.Models
@@ -101,10 +101,13 @@
 </table>
 
 @code {
-    public string ClientID { get; set; }
+    [Parameter]
+    public string Token { get; set; }
+    private AuthorizedUser User { get; set; }
+    private string ClientID { get; set; }
     private TutorToSearch? TutorToSearch { get; set; }
     public List<TutorResult>? TutorsList { get; set; }
-    public List<TutorToShow>? TutorsToShowList { get; set; }
+    private List<TutorToShow>? TutorsToShowList { get; set; }
     private string[]? Orders { get; set; }
     private string[]? Formats { get; set; }
     
@@ -115,14 +118,22 @@
         Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
-        ClientID = "34b4d8ec-ae33-479e-9968-2c2e7383f91e";
+        //ClientID = "34b4d8ec-ae33-479e-9968-2c2e7383f91e";
         
-        var response = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
-        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        var authoResponse = await Http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
+        User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+        if (User.UserId == null)
+        {
+            NavigationManager.NavigateTo("https://localhost:7020/login");
+        }
+        ClientID = User.UserId.ToString();
+        
+        var tutorsResponse = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
+        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         foreach (var tutor in TutorsList)
         {
-            var resp = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
-            var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
+            var subjResponse = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
             TutorsToShowList.Add(new TutorToShow(tutor, subjects));
         }
     }
@@ -171,13 +182,13 @@
                 request += $"TutorsOrder={Array.IndexOf(Orders, TutorToSearch.TutorsOrder)}";
             }
         }
-        var response = await Http.GetAsync(request);
-        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        var tutorsResponse = await Http.GetAsync(request);
+        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         TutorsToShowList = new List<TutorToShow>();
         foreach (var tutor in TutorsList)
         {
-            var resp = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
-            var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
+            var subjResponse = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
             TutorsToShowList.Add(new TutorToShow(tutor, subjects));
         }
     }

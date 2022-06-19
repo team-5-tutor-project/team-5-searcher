@@ -1,12 +1,13 @@
 ﻿@page "/Search"
 @using Microsoft.AspNetCore.Components
+@using Newtonsoft.Json;
 @using TutorProject.Searcher.Front.Models
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
 <PageTitle>Search</PageTitle>
 
-<h1>Search</h1>
+<h1>Поиск</h1>
 
 <div class="col-12">
     <h3><b>Задайте параметры</b></h3>
@@ -56,9 +57,8 @@
         <br />
         <div class="col-12 row">
             <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn-primary" value="Search" />
+            <input type="submit" class="form-control col-1 btn-primary" value="Поиск" />
             <span>&nbsp;</span>
-            <input type="submit" class="form-control col-1 btn-primary" value="Clear" />
         </div>
         
     </EditForm>
@@ -69,6 +69,7 @@
         <thead>
         <tr>
             <th>Имя</th>
+            <th>Описание</th>
             <th>Формат работы</th>
             <th>Цена за час</th>
             <th>Классы обучения</th>
@@ -86,6 +87,7 @@
         {
             <tr>
                 <td>@tut.Tutor.Name</td>
+                <td>@tut.Tutor.Description</td>
                 <td>@tut.Tutor.WorkFormat</td>
                 <td>@tut.Tutor.PricePerHour</td>
                 <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
@@ -113,7 +115,7 @@
         Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
-        ClientID = "12cbe563-a53d-477e-b8ba-9a1741d80567";
+        ClientID = "34b4d8ec-ae33-479e-9968-2c2e7383f91e";
         
         var response = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
         TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
@@ -187,13 +189,19 @@
     
     private async Task AddToBlackList(string tutorId)
     {
-        //Uri uri = new Uri($"https://localhost:7263/blacklist/{ClientID}/addTutorToBlacklist");
-        
-        //await Http.PostAsync(uri,$"?tutorId={tutorId}");
+        var uri = $"https://localhost:7263/blacklist/{ClientID}/addTutorToBlacklist?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
     }
     
     private async Task AddToFavourites(string tutorId)
     {
-        //await Http.PostAsync($"https://localhost:7263/favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}");
+        var uri = $"https://localhost:7263/favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
     }
 }

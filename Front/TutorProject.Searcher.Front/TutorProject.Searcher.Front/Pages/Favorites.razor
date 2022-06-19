@@ -1,4 +1,4 @@
-@page "/Favorites"
+@page "/Favorites/{Token}"
 @using Microsoft.AspNetCore.Components
 @using TutorProject.Searcher.Front.Models
 @inject NavigationManager _navigationManager
@@ -6,9 +6,15 @@
 
 <PageTitle>Favorites</PageTitle>
 
-<h1>Favorites</h1>
+<h1>Избранное</h1>
 
-<table class="table">
+@if (_tutorsToShowList == null || _tutorsToShowList.Count == 0)
+{
+     <p><em>У вас пока нет репетиторов в Избранном</em></p>
+}
+else
+{
+    <table class="table">
         <thead>
         <tr>
             <th>Имя</th>
@@ -19,14 +25,14 @@
             <th>Предметы</th>
             <th></th>
             <th></th>
-            
+
         </tr>
         </thead>
         <tbody>
         @{
-            System.Diagnostics.Debug.Assert(TutorsList != null, nameof(TutorsList) + " != null");
+            System.Diagnostics.Debug.Assert(_tutorsToShowList != null, nameof(_tutorsToShowList) + " != null");
         }
-        @foreach (var tut in TutorsToShowList)
+        @foreach (var tut in _tutorsToShowList)
         {
             <tr>
                 <td>@tut.Tutor.Name</td>
@@ -35,39 +41,51 @@
                 <td>@tut.Tutor.PricePerHour</td>
                 <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
                 <td>@tut.Subjects</td>
-                <td><button class="btn btn-primary" @onclick="@(()=> DeleteFromFavorites(tut.Tutor.Id))">delete</button></td>
-                <td><button class="btn btn-primary" @onclick="@(()=> GoToChat())">chat</button></td>
+                <td><button class="btn btn-primary" @onclick="@(() => DeleteFromFavorites(tut.Tutor.Id))">удалить</button></td>
+                <td><button class="btn btn-primary" @onclick="@(() => GoToChat())">чат</button></td>
             </tr>
         }
         </tbody>
-</table>
+    </table>
+}
 
 @code {
-    private Guid ClientID { get; set; }
-    private List<TutorResult>? TutorsList { get; set; }
-    private List<TutorToShow>? TutorsToShowList { get; set; }
+    [Parameter]
+    public string Token { get; set; }
+    
+    private AuthorizedUser? _client;
+    private List<TutorResult>? _tutorsList;
+    private List<TutorToShow>? _tutorsToShowList;
     
     protected override async Task OnInitializedAsync()
     {
-        ClientID = Guid.Parse("ec7052df-4928-4f42-a8a0-2cff0cb16dd3");
-        TutorsList = new List<TutorResult>();
-        TutorsToShowList = new List<TutorToShow>();
-        
-        var response = await _http.GetAsync($"https://localhost:7263/favorites/{ClientID}/getTutorsFromFavorites");
-        TutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
-        
-        foreach (var tutor in TutorsList)
+        var responseMessage = await _http.GetAsync($"https://localhost:5000/api/authorization/GetAuthorizedUser?token={Token}");
+        _client = responseMessage.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+        if (_client == null || _client.UserId == null)
         {
-            tutor.Description ??= "-";
-            var resp = await _http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
-            var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
-            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            _navigationManager.NavigateTo("/login");
+        }
+        _tutorsList = new List<TutorResult>();
+        _tutorsToShowList = new List<TutorToShow>();
+        
+        var response = await _http.GetAsync($"https://localhost:7263/favorites/{_client.UserId}/getTutorsFromFavorites");
+        _tutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+
+        if (_tutorsList != null)
+        {
+            foreach (var tutor in _tutorsList)
+            {
+                tutor.Description ??= "-";
+                var resp = await _http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+                var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
+                _tutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            }
         }
     }
 
     private async Task DeleteFromFavorites(Guid tutorId)
     {
-        await _http.DeleteAsync($"https://localhost:7263/favorites/{ClientID}/deleteTutorFromFavorites?tutorId={tutorId}");
+        await _http.DeleteAsync($"https://localhost:7263/favorites/{_client.UserId}/deleteTutorFromFavorites?tutorId={tutorId}");
     }
 
     private async Task GoToChat()

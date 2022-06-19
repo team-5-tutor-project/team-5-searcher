@@ -1,0 +1,224 @@
+﻿@page "/Search/{token}"
+@using Microsoft.AspNetCore.Components
+@using Newtonsoft.Json;
+@using TutorProject.Searcher.Front.Models
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<PageTitle>Search</PageTitle>
+
+<h1>Поиск</h1>
+
+<div class="col-12">
+    <h3><b>Задайте параметры</b></h3>
+    <hr />
+    
+    <EditForm Model="@TutorToSearch" OnValidSubmit="@SearchTutor">
+        
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">предмет: </label>
+            <InputText @bind-Value="TutorToSearch.Subject" class="form-control col-3" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">минимальная цена: </label>
+            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.MinPrice" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">максимальная цена: </label>
+            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.MaxPrice" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">класс обучения: </label>
+            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.PupilClass" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">формат работы: </label>
+            <InputSelect @bind-Value="TutorToSearch.WorkFormat" class="form-check.control col-3">
+                @foreach (var format in Formats)
+                {
+                    <option value="@format">@format</option>
+                }
+            </InputSelect>
+        </div>
+        <br />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">сортировка: </label>
+            <InputSelect @bind-Value="TutorToSearch.TutorsOrder" class="form-check.control col-3">
+                @foreach (var order in Orders)
+                {
+                    <option value="@order">@order</option>
+                }
+            </InputSelect>
+        </div>
+        <br />
+        <div class="col-12 row">
+            <span class="col-2"></span>
+            <input type="submit" class="form-control col-1 btn-primary" value="Поиск" />
+            <span>&nbsp;</span>
+        </div>
+        
+    </EditForm>
+</div>
+<br />
+
+<table class="table">
+        <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Описание</th>
+            <th>Формат работы</th>
+            <th>Цена за час</th>
+            <th>Классы обучения</th>
+            <th>Предметы</th>
+            <th>Расписание</th>
+            <th>ЧС</th>
+            <th>Избранное</th>
+            <th>Начать чат</th>
+        </tr>
+        </thead>
+        <tbody>
+        @{
+            System.Diagnostics.Debug.Assert(TutorsList != null, nameof(TutorsList) + " != null");
+        }
+        @foreach (var tut in TutorsToShowList)
+        {
+            <tr>
+                <td>@tut.Tutor.Name</td>
+                <td>@tut.Tutor.Description</td>
+                <td>@tut.Tutor.WorkFormat</td>
+                <td>@tut.Tutor.PricePerHour</td>
+                <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
+                <td>@tut.Subjects</td>
+                <td><button class="btn btn-primary" @onclick="@(()=> NavToSchedule(@tut.Tutor.Id.ToString()))">расписание</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> AddToBlackList(@tut.Tutor.Id.ToString()))">чс</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> AddToFavourites(@tut.Tutor.Id.ToString()))">изб</button></td>
+                <td><button class="btn btn-primary" @onclick="@(()=> StartChat(@tut.Tutor.Id.ToString()))">чат</button></td>
+            </tr>
+        }
+        </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string Token { get; set; }
+    private AuthorizedUser User { get; set; }
+    private string ClientID { get; set; }
+    private TutorToSearch? TutorToSearch { get; set; }
+    public List<TutorResult>? TutorsList { get; set; }
+    private List<TutorToShow>? TutorsToShowList { get; set; }
+    private string[]? Orders { get; set; }
+    private string[]? Formats { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        TutorToSearch = new TutorToSearch();
+        Orders = new[] {"RisingPrice", "DownwardPrice", ""};
+        Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
+        TutorsList = new List<TutorResult>();
+        TutorsToShowList = new List<TutorToShow>();
+        
+        var authoResponse = await Http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
+        User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+        if (User.UserId == null)
+        {
+            NavigationManager.NavigateTo("https://localhost:7020/login");
+        }
+        ClientID = User.UserId.ToString();
+        
+        var tutorsResponse = await Http.GetAsync($"https://localhost:7263/searcher/{ClientID}/getAllTutors");
+        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        foreach (var tutor in TutorsList)
+        {
+            var subjResponse = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+        }
+    }
+    
+    private async Task SearchTutor()
+    {
+        string request = $"https://localhost:7263/searcher/{ClientID}/getAllTutors";
+        if (TutorToSearch.Subject != "" || TutorToSearch.WorkFormat != "" 
+            || TutorToSearch.MinPrice != 0 || TutorToSearch.MaxPrice != 0 
+            || TutorToSearch.PupilClass != 0 || TutorToSearch.TutorsOrder != "")
+        {
+            bool isntFirst = false;
+            request = $"https://localhost:7263/searcher/{ClientID}/search?";
+            if (TutorToSearch.Subject != "")
+            {
+                request += $"Subject={TutorToSearch.Subject}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.WorkFormat != "")
+            {
+                if (isntFirst) request += "&";
+                request += $"WorkFormat={Array.IndexOf(Formats, TutorToSearch.WorkFormat)}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.MinPrice != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"MinPrice={TutorToSearch.MinPrice}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.MaxPrice != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"MaxPrice={TutorToSearch.MaxPrice}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.PupilClass != 0)
+            {
+                if (isntFirst) request += "&";
+                request += $"PupilClass={TutorToSearch.PupilClass}";
+                isntFirst = true;
+            }
+            if (TutorToSearch.TutorsOrder != "")
+            {
+                if (isntFirst) request += "&";
+                request += $"TutorsOrder={Array.IndexOf(Orders, TutorToSearch.TutorsOrder)}";
+            }
+        }
+        var tutorsResponse = await Http.GetAsync(request);
+        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+        TutorsToShowList = new List<TutorToShow>();
+        foreach (var tutor in TutorsList)
+        {
+            var subjResponse = await Http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+        }
+    }
+    
+    private void NavToSchedule(string tutorId)
+    {
+        NavigationManager.NavigateTo($"/search/schedule/{tutorId}");
+    }
+    
+    private async Task AddToBlackList(string tutorId)
+    {
+        var uri = $"https://localhost:7263/blacklist/{ClientID}/addTutorToBlacklist?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
+    }
+    
+    private async Task AddToFavourites(string tutorId)
+    {
+        var uri = $"https://localhost:7263/favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
+    }
+
+    private void StartChat(string tutorId)
+    {
+        
+    }
+}

@@ -1,0 +1,66 @@
+name: Back
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BACK_SOLUTION_PATH: Back/TutorProject.Searcher/TutorProject.Searcher.sln
+  FRONT_SOLUTION_PATH: Front/TutorProject.Searcher.Front/TutorProject.Searcher.Front.sln
+
+jobs:
+  build-back:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Pull git submodule
+      run: git submodule update --init --recursive
+    - name: Restore dependencies
+      run: dotnet restore $BACK_SOLUTION_PATH
+    - name: Build
+      run: dotnet build $BACK_SOLUTION_PATH --no-restore
+    - name: Test
+      run: dotnet test $BACK_SOLUTION_PATH --no-build --verbosity normal
+  push-back-to-dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Authorize Docker Hub
+      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+    - uses: actions/checkout@v3
+    - name: Pull git submodule
+      run: git submodule update --init --recursive
+    - name: Build docker image
+      run: docker build -t kawwik/tutor-project-searcher-back -f Back/TutorProject.Searcher/TutorProject.Searcher.Web/Dockerfile .
+    - name: Push to Docker Hub
+      run: docker push kawwik/tutor-project-searcher-back
+  build-front:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore $FRONT_SOLUTION_PATH
+      - name: Build
+        run: dotnet build $FRONT_SOLUTION_PATH --no-restore
+      - name: Test
+        run: dotnet test $FRONT_SOLUTION_PATH --no-build --verbosity normal
+  push-front-to-dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authorize Docker Hub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+      - uses: actions/checkout@v3
+      - run: ls
+      - name: Build docker image
+        run: docker build -t kawwik/tutor-project-searcher-front -f Front/TutorProject.Searcher.Front/TutorProject.Searcher.Front/Dockerfile .
+      - name: Push to Docker Hub
+        run: docker push kawwik/tutor-project-searcher-front

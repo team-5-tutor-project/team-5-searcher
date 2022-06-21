@@ -29,6 +29,12 @@ public class FavoritesRepository
             return false;
         }
 
+        var black = await _context.Blacklist.SingleOrDefaultAsync(ct => ct.Client.Id == clientId && ct.Tutor.Id == tutorId);
+        if (black != null)
+        {
+            _context.Blacklist.Remove(black);
+        }
+        
         var fav = new Account.Common.Models.Favorites()
         {
             Id = Guid.NewGuid(),

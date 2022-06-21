@@ -36,7 +36,7 @@ public class TutorScheduleController : ControllerBase
     
     [HttpPut("{tutorId}/addFreeTime")]
     public async Task<IActionResult> AddFreeTime(Guid tutorId, 
-        [FromBody] ScheduleDto scheduleDto)
+        [FromQuery] ScheduleDto scheduleDto)
     {
         var scheduleData = _mapper.Map<ScheduleData>(scheduleDto);
         var result = await _service.AddFreeTime(tutorId, scheduleData);
@@ -49,7 +49,7 @@ public class TutorScheduleController : ControllerBase
         return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
-    [HttpPut("{tutorId}/setAllTimeFree")]
+    [HttpDelete("{tutorId}/setAllTimeFree")]
     public async Task<IActionResult> AddFreeTime(Guid tutorId)
     {
         var result = await _service.SetAllTimeFree(tutorId);
@@ -86,10 +86,10 @@ public class TutorScheduleController : ControllerBase
         return Ok(_mapper.Map<ScheduleResult>(result));
     }
     
-    [HttpDelete("{tutorId}/setTimeTaken")]
+    [HttpPut("{tutorId}/setTimeTaken")]
     public async Task<IActionResult> SetTimeTaken(
         Guid tutorId, 
-        [FromBody] ScheduleDto scheduleDto)
+        [FromQuery] ScheduleDto scheduleDto)
     {
         var scheduleData = _mapper.Map<ScheduleData>(scheduleDto);
         var result = await _service.SetTimeTaken(tutorId, scheduleData);

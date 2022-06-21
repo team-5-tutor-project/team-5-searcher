@@ -1,4 +1,4 @@
-﻿@page "/Search/{token}"
+﻿@page "/Search/b8c01017-bbeb-4b8a-b078-91ea222a734b"
 @using Microsoft.AspNetCore.Components
 @using Newtonsoft.Json;
 @using TutorProject.Searcher.Front.Models
@@ -57,7 +57,7 @@
         <br />
         <div class="col-12 row">
             <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn-primary" value="Поиск" />
+            <input type="submit" class="form-control col-1 btn-primary" @onclick="@(()=> SearchTutor())" value="Поиск" />
             <span>&nbsp;</span>
         </div>
         
@@ -106,7 +106,7 @@
     [Parameter]
     public string Token { get; set; }
     private AuthorizedUser User { get; set; }
-    private string ClientID { get; set; }
+    private string ClientID { get; set; } = "b8c01017-bbeb-4b8a-b078-91ea222a734b";
     private TutorToSearch? TutorToSearch { get; set; }
     public List<TutorResult>? TutorsList { get; set; }
     private List<TutorToShow>? TutorsToShowList { get; set; }

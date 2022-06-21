@@ -1,0 +1,136 @@
+﻿@page "/search/schedule-editor/{tutorId}/{userId}"
+@using TutorProject.Searcher.Front.Models
+@using Newtonsoft.Json
+
+@inject HttpClient Http
+
+
+<PageTitle>SchedulEditor</PageTitle>
+
+<h2>Расписание</h2>
+<p></p>
+<p></p>
+<button class="btn btn-success btn-sm" @onclick="() => SetAllTimeFree()">
+    Освободить все расписание
+</button>
+<button class="btn btn-danger btn-sm" @onclick="() => SetAllTimeTaken()">
+    Закрыть все расписание
+</button>
+<p></p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th class="text-center">Понедельник</th>
+        <th class="text-center">Вторник</th>
+        <th class="text-center">Среда</th>
+        <th class="text-center">Четверг</th>
+        <th class="text-center">Пятница</th>
+        <th class="text-center">Суббота</th>
+        <th class="text-center">Воскресенье</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+    @for (int i = 0; i < 12; i++)
+    {
+        <tr>
+            @for (int j = 0; j < 7; j++)
+            {
+                @switch (TutorSchedule?.FreeTimeSchedule[j].DaySchedule[i].ToString())
+                {
+                    case "True":
+                        <td>
+                            <blockquote class="blockquote text-center">
+                                <button class="btn btn-success btn-sm" @onclick="() => SetTimeTaken(j,i)">
+                                    @LessonTime[i]
+                                </button>
+                            </blockquote>
+                        </td>
+                        break;
+                    case "False":
+                        <td>
+                            <blockquote class="blockquote text-center" @onclick="() => SetTimeFree(j, i)">
+                                <button class="btn btn-secondary btn-sm">
+                                    @LessonTime[i]
+                                </button>
+                            </blockquote>
+                        </td>
+                        break;
+                }
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string TutorId { get; set; }
+    
+    [Parameter]
+    public string UserId { get; set; }
+    
+    private ScheduleResult? TutorSchedule { get; set; }
+    private List<string> LessonTime { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync($"https://localhost:7263/schedule/{TutorId}/getSchedule");
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+
+        for (int i = 0; i < 12; i++)
+        {
+            LessonTime.Add((i + 9).ToString() + ":00");
+        }
+    }
+
+    
+    private async Task SetAllTimeTaken()
+    {
+        var uri = $"https://localhost:7263/schedule/{TutorId}/setAllTimeTaken";
+        var response = await Http.DeleteAsync(uri);
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+    }
+    
+    private async Task SetAllTimeFree()
+    {
+        var uri = $"https://localhost:7263/schedule/{TutorId}/setAllTimeFree";
+        var response = await Http.DeleteAsync(uri);
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+    }
+    
+    private async Task SetTimeTaken(int day, int lessonTime)
+    {
+        var uri = $"https://localhost:7263/schedule/{TutorId}/setTimeTaken";
+        var lesson = new Lesson()
+        {
+            TutorId = TutorSchedule.Tutor.Id,
+            DayOfWeek = day,
+            LessonTime = lessonTime
+        };
+        
+        string json = JsonConvert.SerializeObject(lesson);
+        HttpContent content = new StringContent(json);
+        var response = await Http.PutAsync(uri, content);
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+    }
+
+    private async Task SetTimeFree(int day, int lessonTime)
+    {
+        var uri = $"https://localhost:7263/schedule/{TutorId}/addFreeTime";
+        var lesson = new Lesson()
+        {
+            TutorId = TutorSchedule.Tutor.Id,
+            DayOfWeek = day,
+            LessonTime = lessonTime
+        };
+        Console.WriteLine(day);
+        Console.WriteLine(lessonTime);
+        string json = JsonConvert.SerializeObject(lesson);
+        HttpContent content = new StringContent(json);
+        var response = await Http.PutAsync(uri, content);
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+    }
+
+}

@@ -1,0 +1,94 @@
+﻿@page "/search/schedule/{tutorId}/{userId}"
+@using TutorProject.Searcher.Front.Models
+@inject HttpClient Http
+
+<PageTitle>Schedule</PageTitle>
+
+<h2>Расписание</h2>
+
+<h3>@TutorSchedule?.Tutor.Name</h3>
+<h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PricePerHour ₽</h5>
+<p>@TutorSchedule?.Tutor.Description</p>
+@if (UserId == TutorId)
+{
+    <a href="https://localhost:7086/search/schedule-editor/@TutorId/@UserId" class="card-link" >Редактировать расписание</a>
+}
+else
+{
+    <a href="#" class="card-link" >Начать чат</a>
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th class="text-center">Понедельник</th>
+        <th class="text-center">Вторник</th>
+        <th class="text-center">Среда</th>
+        <th class="text-center">Четверг</th>
+        <th class="text-center">Пятница</th>
+        <th class="text-center">Суббота</th>
+        <th class="text-center">Воскресенье</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+    @for (var i = 0; i < 12; i++)
+    {
+        <tr>
+            @for (var j = 0; j < 7; j++)
+            {
+                @switch (TutorSchedule?.FreeTimeSchedule[j].DaySchedule[i].ToString())
+                {
+                    case "True":
+                        <td>
+                            <blockquote class="blockquote text-center">
+                                <button class="btn btn-success btn-sm">
+                                    @LessonTime[i]
+                                </button>
+                            </blockquote>
+                        </td>
+                        break;
+                    case "False":
+                        <td>
+                            <blockquote class="blockquote text-center">
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    @LessonTime[i]
+                                </button>
+                            </blockquote>
+                        </td>
+                        break;
+                    
+                }
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public string TutorId { get; set; }
+    
+    [Parameter]
+    public string UserId { get; set; }
+
+    private ScheduleResult? TutorSchedule { get; set; }
+    private List<string> LessonTime { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync($"https://localhost:7263/schedule/{TutorId}/getSchedule");
+        TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
+
+        for (int i = 0; i < 12; i++)
+        {
+            LessonTime.Add((i + 9).ToString() + ":00");
+        }
+    }
+    
+    private void StartChat(string? tutorId)
+    {
+        
+    }
+}

@@ -59,7 +59,7 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        var responseMessage = await _http.GetAsync($"https://localhost:5000/api/authorization/GetAuthorizedUser?token={Token}");
+        var responseMessage = await _http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
         _client = responseMessage.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (_client == null || _client.UserId == null)
         {

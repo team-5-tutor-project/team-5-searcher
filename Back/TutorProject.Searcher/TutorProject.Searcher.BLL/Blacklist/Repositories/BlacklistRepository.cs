@@ -28,6 +28,13 @@ public class BlacklistRepository
             return false;
         }
 
+        var fav =
+            await _context.Favorites.SingleOrDefaultAsync(ct => ct.Client.Id == clientId && ct.Tutor.Id == tutorId);
+        if ( fav != null)
+        {
+            _context.Favorites.Remove(fav);
+        }
+        
         var black = new Account.Common.Models.Blacklist()
         {
             Id = Guid.NewGuid(),

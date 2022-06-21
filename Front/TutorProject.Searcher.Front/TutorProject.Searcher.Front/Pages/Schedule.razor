@@ -1,5 +1,6 @@
-﻿@page "/search/schedule/{tutorId}/{userId}"
+﻿@page "/search/schedule/{tutorId}/{token}"
 @using TutorProject.Searcher.Front.Models
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
 
 <PageTitle>Schedule</PageTitle>
@@ -9,9 +10,9 @@
 <h3>@TutorSchedule?.Tutor.Name</h3>
 <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PricePerHour ₽</h5>
 <p>@TutorSchedule?.Tutor.Description</p>
-@if (UserId == TutorId)
+@if (ClientId == TutorId)
 {
-    <a href="https://localhost:7086/search/schedule-editor/@TutorId/@UserId" class="card-link" >Редактировать расписание</a>
+    <a href="https://localhost:7086/search/schedule-editor/@TutorId/@Token" class="card-link" >Редактировать расписание</a>
 }
 else
 {
@@ -71,13 +72,23 @@ else
     public string TutorId { get; set; }
     
     [Parameter]
-    public string UserId { get; set; }
+    public string Token { get; set; }
 
+    private AuthorizedUser User { get; set; }
+    private string ClientId { get; set; }
     private ScheduleResult? TutorSchedule { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
+        var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
+        User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+        if (User.UserId == null)
+        {
+            NavigationManager.NavigateTo("https://localhost:7020/login");
+        }
+        ClientId = User.UserId.ToString();
+        
         var response = await Http.GetAsync($"https://localhost:7263/schedule/{TutorId}/getSchedule");
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
 

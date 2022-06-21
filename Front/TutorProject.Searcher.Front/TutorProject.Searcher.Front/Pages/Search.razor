@@ -1,4 +1,4 @@
-﻿@page "/Search/b8c01017-bbeb-4b8a-b078-91ea222a734b"
+﻿@page "/Search/{token}"
 @using Microsoft.AspNetCore.Components
 @using Newtonsoft.Json;
 @using TutorProject.Searcher.Front.Models
@@ -106,7 +106,7 @@
     [Parameter]
     public string Token { get; set; }
     private AuthorizedUser User { get; set; }
-    private string ClientID { get; set; } = "b8c01017-bbeb-4b8a-b078-91ea222a734b";
+    private string ClientID { get; set; }
     private TutorToSearch? TutorToSearch { get; set; }
     public List<TutorResult>? TutorsList { get; set; }
     private List<TutorToShow>? TutorsToShowList { get; set; }
@@ -121,7 +121,7 @@
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
         
-        var authoResponse = await Http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
+        var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
@@ -196,7 +196,7 @@
     
     private void NavToSchedule(string tutorId)
     {
-        NavigationManager.NavigateTo($"/search/schedule/{tutorId}");
+        NavigationManager.NavigateTo($"/search/schedule/{tutorId}/{Token}");
     }
     
     private async Task AddToBlackList(string tutorId)

@@ -1,4 +1,4 @@
-﻿@page "/search/schedule-editor/{tutorId}/{token}"
+﻿@page "/search/schedule-editor/{token}"
 @using TutorProject.Searcher.Front.Models
 @using Newtonsoft.Json
 @inject NavigationManager NavigationManager
@@ -75,13 +75,10 @@
 
 @code {
     [Parameter]
-    public string TutorId { get; set; }
-    
-    [Parameter]
     public string Token { get; set; }
-
+    
     private AuthorizedUser User { get; set; }
-    private string ClientId { get; set; }
+    private string UserId { get; set; }
     
     private ScheduleResult? TutorSchedule { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
@@ -94,9 +91,9 @@
         {
             NavigationManager.NavigateTo("https://localhost:7020/login");
         }
-        ClientId = User.UserId.ToString();
+        UserId = User.UserId.ToString();
         
-        var response = await Http.GetAsync($"https://localhost:7263/schedule/{TutorId}/getSchedule");
+        var response = await Http.GetAsync($"https://localhost:7263/schedule/{UserId}/getSchedule");
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
 
         for (int i = 0; i < 12; i++)
@@ -108,24 +105,24 @@
     
     private async Task SetAllTimeTaken()
     {
-        var uri = $"https://localhost:7263/schedule/{TutorId}/setAllTimeTaken";
+        var uri = $"https://localhost:7263/schedule/{UserId}/setAllTimeTaken";
         var response = await Http.DeleteAsync(uri);
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
     }
     
     private async Task SetAllTimeFree()
     {
-        var uri = $"https://localhost:7263/schedule/{TutorId}/setAllTimeFree";
+        var uri = $"https://localhost:7263/schedule/{UserId}/setAllTimeFree";
         var response = await Http.DeleteAsync(uri);
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
     }
     
     private async Task SetTimeTaken(int day, int lessonTime)
     {
-        var uri = $"https://localhost:7263/schedule/{TutorId}/setTimeTaken?DayOfWeek={day}&LessonNumber={lessonTime}";
+        var uri = $"https://localhost:7263/schedule/{UserId}/setTimeTaken?DayOfWeek={day}&LessonNumber={lessonTime}";
         var lesson = new Lesson()
         {
-            // TutorId = TutorSchedule.Tutor.Id,
+            // UserId = TutorSchedule.Tutor.Id,
             DayOfWeek = day,
             LessonTime = lessonTime
         };
@@ -137,10 +134,10 @@
 
     private async Task SetTimeFree(int day, int lessonTime)
     {
-        var uri = $"https://localhost:7263/schedule/{TutorId}/addFreeTime?DayOfWeek={day}&LessonNumber={lessonTime}";
+        var uri = $"https://localhost:7263/schedule/{UserId}/addFreeTime?DayOfWeek={day}&LessonNumber={lessonTime}";
         var lesson = new Lesson()
         {
-            TutorId = new Guid(TutorId),
+            TutorId = new Guid(UserId),
             DayOfWeek = day,
             LessonTime = lessonTime
         };

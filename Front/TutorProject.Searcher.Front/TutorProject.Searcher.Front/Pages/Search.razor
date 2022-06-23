@@ -57,7 +57,7 @@
         <br />
         <div class="col-12 row">
             <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn-primary" value="Поиск" />
+            <input type="submit" class="form-control col-1 btn-primary" @onclick="@(()=> SearchTutor())" value="Поиск" />
             <span>&nbsp;</span>
         </div>
         
@@ -121,7 +121,7 @@
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
         
-        var authoResponse = await Http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
+        var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
@@ -196,7 +196,7 @@
     
     private void NavToSchedule(string tutorId)
     {
-        NavigationManager.NavigateTo($"/search/schedule/{tutorId}");
+        NavigationManager.NavigateTo($"/search/schedule/{tutorId}/{Token}");
     }
     
     private async Task AddToBlackList(string tutorId)

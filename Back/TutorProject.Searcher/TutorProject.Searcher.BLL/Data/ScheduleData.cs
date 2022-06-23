@@ -2,6 +2,6 @@
 
 public class ScheduleData
 {
-    public DayOfWeek DayOfWeek { get; set; }
+    public int DayOfWeek { get; set; }
     public int LessonNumber { get; set; }
 }

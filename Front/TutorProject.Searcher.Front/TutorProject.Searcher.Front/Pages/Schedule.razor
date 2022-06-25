@@ -12,7 +12,7 @@
 <p>@TutorSchedule?.Tutor.Description</p>
 @if (ClientId == TutorId)
 {
-    <a href="https://localhost:7086/search/schedule-editor/@Token" class="card-link" >Редактировать расписание</a>
+    <a href="http://localhost:7000/search/schedule-editor/@Token" class="card-link" >Редактировать расписание</a>
 }
 else
 {
@@ -87,7 +87,7 @@ else
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
-            NavigationManager.NavigateTo("https://localhost:7020/login");
+            NavigationManager.NavigateTo("http://localhost:7020/login");
         }
         ClientId = User.UserId.ToString();
         

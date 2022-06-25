@@ -90,7 +90,7 @@
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
-            NavigationManager.NavigateTo("https://localhost:7020/login");
+            NavigationManager.NavigateTo("http://localhost:7020/login");
         }
         UserId = User.UserId.ToString();
         

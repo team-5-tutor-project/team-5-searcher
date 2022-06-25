@@ -10,7 +10,7 @@
 
 @if (_tutorsToShowList == null || _tutorsToShowList.Count == 0)
 {
-     <p><em>У вас пока нет репетиторов в черном списке.</em></p>
+     <p><em>@_message</em></p>
 }
 else
 {
@@ -87,7 +87,7 @@ else
                 _tutorsToShowList.Add(new TutorToShow(tutor, subjects));
             }
         }
-        _message = "У вас пока нет репетиторов в Избранном";
+        _message = "У вас пока нет репетиторов в Черном списке";
     }
 
     private async Task DeleteFromBlacklist(Guid tutorId)

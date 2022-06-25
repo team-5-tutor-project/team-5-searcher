@@ -22,6 +22,11 @@ public class BlacklistService : IBlacklistService
     {
         return await _repository.DeleteTutorFromBlacklist(clientId, tutorId);
     }
+
+    public async Task<bool> CheckTutorInBlacklist(Guid clientId, Guid tutorId)
+    {
+        return await _repository.CheckTutorInBlacklist(clientId, tutorId);
+    }
     
     public async Task<List<Tutor>> GetTutorsFromBlacklist(Guid clientId)
     {

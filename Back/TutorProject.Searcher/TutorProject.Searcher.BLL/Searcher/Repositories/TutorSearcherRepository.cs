@@ -43,30 +43,30 @@ public class TutorSearcherRepository
                 tutors = await _context.TutorToSubjects.Where(t =>
                     (subject == null || t.Subject.Name.ToLower() == subject.ToLower())
                     && (workFormat == null || t.Tutor.WorkFormat == null || t.Tutor.WorkFormat == workFormat)
-                    && t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice
-                    && (pupilClass == null || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass == null
-                                           || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass >= pupilClass
-                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == null
+                    && (t.Tutor.PricePerHour == 0 || t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice)
+                    && (pupilClass == null || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass == 0
+                                           || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass >= pupilClass
+                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == 0
                                            || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass >= pupilClass)).OrderBy(t => t.Tutor.PricePerHour).ToListAsync();
                 break;
             case TutorsOrder.DownwardPrice:
                 tutors = await _context.TutorToSubjects.Where(t =>
                     (subject == null || t.Subject.Name.ToLower() == subject.ToLower())
                     && (workFormat == null || t.Tutor.WorkFormat == null || t.Tutor.WorkFormat == workFormat)
-                    && t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice
-                    && (pupilClass == null || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass == null
-                                           || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass >= pupilClass
-                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == null
+                    && (t.Tutor.PricePerHour == 0 || t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice)
+                    && (pupilClass == null || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass == 0
+                                           || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass >= pupilClass
+                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == 0
                                            || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass >= pupilClass)).OrderByDescending(t => t.Tutor.PricePerHour).ToListAsync();
                 break;
             default:
                 tutors = await _context.TutorToSubjects.Where(t =>
                     (subject == null || t.Subject.Name.ToLower() == subject.ToLower())
                     && (workFormat == null || t.Tutor.WorkFormat == null || t.Tutor.WorkFormat == workFormat)
-                    && t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice
-                    && (pupilClass == null || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass == null
-                                           || t.Tutor.PupilMinClass == null && t.Tutor.PupilMaxClass >= pupilClass
-                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == null
+                    && (t.Tutor.PricePerHour == 0 || t.Tutor.PricePerHour >= minPrice && t.Tutor.PricePerHour <= maxPrice)
+                    && (pupilClass == null || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass == 0
+                                           || t.Tutor.PupilMinClass == 0 && t.Tutor.PupilMaxClass >= pupilClass
+                                           || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass == 0
                                            || t.Tutor.PupilMinClass <= pupilClass && t.Tutor.PupilMaxClass >= pupilClass)).ToListAsync();
                 break;
         }

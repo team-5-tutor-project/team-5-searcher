@@ -23,6 +23,10 @@ public class FavoritesService : IFavoritesService
         return await _repository.DeleteTutorFromFavorites(clientId, tutorId);
     }
 
+    public async Task<bool> CheckTutorInFavorites(Guid clientId, Guid tutorId)
+    {
+        return await _repository.CheckTutorInFavorites(clientId, tutorId);
+    }
     public async Task<List<Tutor>> GetTutorsFromFavorites(Guid clientId)
     {
         var clientToTutor = await _repository.GetTutorsFromFavorites(clientId);

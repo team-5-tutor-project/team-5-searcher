@@ -4,8 +4,8 @@ COPY . ./
 RUN dotnet publish Back/TutorProject.Searcher/TutorProject.Searcher.Web/TutorProject.Searcher.Web.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
-EXPOSE 6000
-ENV ASPNETCORE_URLS=http://+:6000
+EXPOSE 6001
+ENV ASPNETCORE_URLS=http://+:6001
 WORKDIR /back
 COPY --from=build /back/out .
 ENTRYPOINT ["dotnet", "TutorProject.Searcher.Web.dll"]

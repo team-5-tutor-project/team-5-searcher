@@ -188,12 +188,14 @@
         var tutorsResponse = await Http.GetAsync(request);
         TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         TutorsToShowList = new List<TutorToShow>();
+        var result = new List<TutorToShow>();
         foreach (var tutor in TutorsList)
         {
             var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
             var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
-            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            result.Add(new TutorToShow(tutor, subjects));
         }
+        TutorsToShowList = result;
     }
     
     private void NavToSchedule(string tutorId)

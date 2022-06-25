@@ -41,6 +41,12 @@ public class BlacklistController : ControllerBase
         
         return StatusCode((int) HttpStatusCode.BadRequest);
     }
+
+    [HttpGet("{clientId}/checkTutorInBlacklist")]
+    public async Task<bool> CheckTutorInBlacklist(Guid clientId, [FromQuery] Guid tutorId)
+    {
+        return await _service.CheckTutorInBlacklist(clientId, tutorId);
+    }
     
     [HttpGet("{clientId}/getTutorsFromBlacklist")]
     public async Task<IActionResult> GetTutorsFromBlacklist(Guid clientId)

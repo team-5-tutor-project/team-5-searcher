@@ -63,7 +63,18 @@ public class FavoritesRepository
         
         return true;
     }
+    
+    public async Task<bool> CheckTutorInFavorites(Guid clientId, Guid tutorId)
+    {
+        var clientToTutor = await _context.Favorites.SingleOrDefaultAsync(ctt =>
+            ctt.Client.Id == clientId && ctt.Tutor.Id == tutorId);
+        if (clientToTutor == null)
+        {
+            return false;
+        }
 
+        return true;
+    }
     public async Task<List<Account.Common.Models.Favorites>> GetTutorsFromFavorites(Guid clientId)
     {
         return await _context.Favorites.Where(ctt => ctt.Client.Id == clientId)

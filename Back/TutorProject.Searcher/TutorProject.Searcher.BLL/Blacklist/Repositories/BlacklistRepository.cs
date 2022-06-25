@@ -64,6 +64,18 @@ public class BlacklistRepository
         return true;
     }
     
+    public async Task<bool> CheckTutorInBlacklist(Guid clientId, Guid tutorId)
+    {
+        var clientToTutor = await _context.Blacklist.SingleOrDefaultAsync(ctt =>
+            ctt.Client.Id == clientId && ctt.Tutor.Id == tutorId);
+        if (clientToTutor == null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
     public async Task<List<Account.Common.Models.Blacklist>> GetTutorsFromBlacklist(Guid clientId)
     {
         return await _context.Blacklist.Where(ctt => ctt.Client.Id == clientId)

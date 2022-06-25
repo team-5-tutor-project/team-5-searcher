@@ -63,14 +63,14 @@ public class TutorScheduleRepository
         return schedule;
     }
 
-    public async Task<Schedule?> AddFreeTime(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule?> AddFreeTime(Guid tutorId, int dayOfWeek, int lessonNumber)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(sdl => sdl.Tutor.Id == tutorId);
 
         if (schedule == null)
             return null;
         
-        schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = true;
+        schedule.FreeTimeSchedule[dayOfWeek].DaySchedule[lessonNumber] = true;
         
         await _context.SaveChangesAsync();
         
@@ -104,14 +104,14 @@ public class TutorScheduleRepository
         return schedule;
     }
     
-    public async Task<Schedule?> SetTimeTaken(Guid tutorId, DayOfWeek dayOfWeek, int lessonNumber)
+    public async Task<Schedule?> SetTimeTaken(Guid tutorId, int dayOfWeek, int lessonNumber)
     {
         var schedule = await _context.Schedules.SingleOrDefaultAsync(x => x.Tutor.Id == tutorId);
 
         if (schedule == null)
             return null;
         
-        schedule.FreeTimeSchedule[(int) dayOfWeek].DaySchedule[lessonNumber - 1] = false;
+        schedule.FreeTimeSchedule[dayOfWeek].DaySchedule[lessonNumber] = false;
         
         await _context.SaveChangesAsync();
 

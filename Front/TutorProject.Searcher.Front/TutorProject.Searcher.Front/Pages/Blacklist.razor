@@ -56,10 +56,12 @@ else
     private AuthorizedUser? _client;
     private List<TutorResult>? _tutorsList;
     private List<TutorToShow>? _tutorsToShowList;
+    private string Start { get; set; } = "http://localhost:6001/";
+
     
     protected override async Task OnInitializedAsync()
     {
-        var responseMessage = await _http.GetAsync($"https://localhost:5000/api/authorization?token={Token}");
+        var responseMessage = await _http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         _client = responseMessage.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (_client == null || _client.UserId == null)
         {
@@ -68,7 +70,7 @@ else
         _tutorsList = new List<TutorResult>();
         _tutorsToShowList = new List<TutorToShow>();
         
-        var response = await _http.GetAsync($"https://localhost:7263/blacklist/{_client.UserId}/getTutorsFromBlacklist");
+        var response = await _http.GetAsync(Start + $"blacklist/{_client.UserId}/getTutorsFromBlacklist");
         _tutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
 
         if (_tutorsList != null)
@@ -76,7 +78,7 @@ else
             foreach (var tutor in _tutorsList)
             {
                 tutor.Description ??= "-";
-                var resp = await _http.GetAsync($"https://localhost:7263/searcher/{tutor.Id}/getAllSubjects");
+                var resp = await _http.GetAsync(Start + $"searcher/{tutor.Id}/getAllSubjects");
                 var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
                 _tutorsToShowList.Add(new TutorToShow(tutor, subjects));
             }
@@ -85,7 +87,7 @@ else
 
     private async Task DeleteFromBlacklist(Guid tutorId)
     {
-        await _http.DeleteAsync($"https://localhost:7263/blacklist/{_client.UserId}/deleteTutorFromBlacklist?tutorId={tutorId}");
+        await _http.DeleteAsync(Start + $"blacklist/{_client.UserId}/deleteTutorFromBlacklist?tutorId={tutorId}");
     }
 
     private async Task GoToChat()

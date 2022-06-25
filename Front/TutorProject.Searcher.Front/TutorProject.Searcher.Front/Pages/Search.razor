@@ -112,6 +112,8 @@
     private List<TutorToShow>? TutorsToShowList { get; set; }
     private string[]? Orders { get; set; }
     private string[]? Formats { get; set; }
+    private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
+    private string ListsStart { get; set; } = "http://localhost:6001/";
     
     protected override async Task OnInitializedAsync()
     {
@@ -120,7 +122,7 @@
         Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
-        
+
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
@@ -129,11 +131,11 @@
         }
         ClientID = User.UserId.ToString();
         
-        var tutorsResponse = await Http.GetAsync($"http://localhost:6001/searcher/{ClientID}/getAllTutors");
+        var tutorsResponse = await Http.GetAsync(SearchStart + $"{ClientID}/getAllTutors");
         TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         foreach (var tutor in TutorsList)
         {
-            var subjResponse = await Http.GetAsync($"http://localhost:6001/searcher/{tutor.Id}/getAllSubjects");
+            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
             var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
             TutorsToShowList.Add(new TutorToShow(tutor, subjects));
         }
@@ -141,13 +143,13 @@
     
     private async Task SearchTutor()
     {
-        string request = $"http://localhost:6001/searcher/{ClientID}/getAllTutors";
+        string request = SearchStart + $"{ClientID}/getAllTutors";
         if (TutorToSearch.Subject != "" || TutorToSearch.WorkFormat != "" 
             || TutorToSearch.MinPrice != 0 || TutorToSearch.MaxPrice != 0 
             || TutorToSearch.PupilClass != 0 || TutorToSearch.TutorsOrder != "")
         {
             bool isntFirst = false;
-            request = $"http://localhost:6001/searcher/{ClientID}/search?";
+            request = SearchStart + $"{ClientID}/search?";
             if (TutorToSearch.Subject != "")
             {
                 request += $"Subject={TutorToSearch.Subject}";
@@ -188,7 +190,7 @@
         TutorsToShowList = new List<TutorToShow>();
         foreach (var tutor in TutorsList)
         {
-            var subjResponse = await Http.GetAsync($"http://localhost:6001/searcher/{tutor.Id}/getAllSubjects");
+            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
             var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
             TutorsToShowList.Add(new TutorToShow(tutor, subjects));
         }
@@ -201,7 +203,7 @@
     
     private async Task AddToBlackList(string tutorId)
     {
-        var uri = $"http://localhost:6001/blacklist/{ClientID}/addTutorToBlacklist?tutorId={tutorId}";
+        var uri = ListsStart + $"blacklist/{ClientID}/addTutorToBlacklist?tutorId={tutorId}";
         var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
         string json = JsonConvert.SerializeObject(clientToTutor);
         HttpContent content = new StringContent(json);
@@ -210,7 +212,7 @@
     
     private async Task AddToFavourites(string tutorId)
     {
-        var uri = $"http://localhost:6001/favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}";
+        var uri = ListsStart + $"favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}";
         var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
         string json = JsonConvert.SerializeObject(clientToTutor);
         HttpContent content = new StringContent(json);

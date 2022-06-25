@@ -38,19 +38,19 @@ public class DataSyncRepository
                 PupilMinClass = _random.Next(1, pupilMaxClass)
             };
             
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-                Name = _subjectsNames[_random.Next(_subjectsNames.Length)]
-            };
-            
-            var tutorToSubject = new TutorToSubject
-           {
-               Id = Guid.NewGuid(),
-               Tutor = tutor,
-               Subject = subject
-           };
-            await _context.TutorToSubjects.AddAsync(tutorToSubject);
+           //  var subject = new Subject
+           //  {
+           //      Id = Guid.NewGuid(),
+           //      Name = _subjectsNames[_random.Next(_subjectsNames.Length)]
+           //  };
+           //  
+           //  var tutorToSubject = new TutorToSubject
+           // {
+           //     Id = Guid.NewGuid(),
+           //     Tutor = tutor,
+           //     Subject = subject
+           // };
+           //  await _context.TutorToSubjects.AddAsync(tutorToSubject);
             
             var newSchedule = new Schedule
             {

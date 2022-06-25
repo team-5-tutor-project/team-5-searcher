@@ -82,6 +82,7 @@
     
     private ScheduleResult? TutorSchedule { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
+    private string ScheduleStart { get; set; } = "http://localhost:6001/schedule/";
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,7 +94,7 @@
         }
         UserId = User.UserId.ToString();
         
-        var response = await Http.GetAsync($"https://localhost:7263/schedule/{UserId}/getSchedule");
+        var response = await Http.GetAsync(ScheduleStart + $"{UserId}/getSchedule");
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
 
         for (int i = 0; i < 12; i++)
@@ -105,21 +106,21 @@
     
     private async Task SetAllTimeTaken()
     {
-        var uri = $"https://localhost:7263/schedule/{UserId}/setAllTimeTaken";
+        var uri = ScheduleStart + $"{UserId}/setAllTimeTaken";
         var response = await Http.DeleteAsync(uri);
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
     }
     
     private async Task SetAllTimeFree()
     {
-        var uri = $"https://localhost:7263/schedule/{UserId}/setAllTimeFree";
+        var uri = ScheduleStart + $"{UserId}/setAllTimeFree";
         var response = await Http.DeleteAsync(uri);
         TutorSchedule = response.Content.ReadFromJsonAsync<ScheduleResult>().Result;
     }
     
     private async Task SetTimeTaken(int day, int lessonTime)
     {
-        var uri = $"https://localhost:7263/schedule/{UserId}/setTimeTaken?DayOfWeek={day}&LessonNumber={lessonTime}";
+        var uri = ScheduleStart + $"{UserId}/setTimeTaken?DayOfWeek={day}&LessonNumber={lessonTime}";
         var lesson = new Lesson()
         {
             // UserId = TutorSchedule.Tutor.Id,
@@ -134,7 +135,7 @@
 
     private async Task SetTimeFree(int day, int lessonTime)
     {
-        var uri = $"https://localhost:7263/schedule/{UserId}/addFreeTime?DayOfWeek={day}&LessonNumber={lessonTime}";
+        var uri = ScheduleStart + $"{UserId}/addFreeTime?DayOfWeek={day}&LessonNumber={lessonTime}";
         var lesson = new Lesson()
         {
             TutorId = new Guid(UserId),

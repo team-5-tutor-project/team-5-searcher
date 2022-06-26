@@ -7,6 +7,11 @@
 @inject HttpClient Http
 
 <PageTitle>Additional Information</PageTitle>
+<button class="btn btn-warning" style="float: right" @onclick="() => NavigateToHome()">
+    Домой
+</button>
+<br>
+<br>
 @if (TutorSchedule != null)
 {
     <div>
@@ -275,5 +280,10 @@
         }
 
         NavigationManager.NavigateTo($"http://localhost:9000/chat/{receivedChat.chat_id}/{Token}");
+    }
+    
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("http://localhost:5000/login");
     }
 }

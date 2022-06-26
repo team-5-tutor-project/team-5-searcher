@@ -8,71 +8,92 @@
 
 <PageTitle>SchedulEditor</PageTitle>
 
-<h2>Расписание</h2>
-<p></p>
-<p></p>
-<button class="btn btn-success btn-sm" @onclick="() => SetAllTimeFree()">
-    Освободить все расписание
+<button class="btn btn-warning" style="float: right" @onclick="() => NavigateToHome()">
+    Домой
 </button>
-<button class="btn btn-danger btn-sm" @onclick="() => SetAllTimeTaken()">
-    Закрыть все расписание
-</button>
-<p></p>
+<br>
+<br>
+<br>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th class="text-center">Понедельник</th>
-        <th class="text-center">Вторник</th>
-        <th class="text-center">Среда</th>
-        <th class="text-center">Четверг</th>
-        <th class="text-center">Пятница</th>
-        <th class="text-center">Суббота</th>
-        <th class="text-center">Воскресенье</th>
-    </tr>
-    </thead>
-    <tbody>
+    <h2><strong>Расписание</strong></h2>
+<br>
+<br>
 
+    <button class="btn btn-success btn-lg" @onclick="() => SetAllTimeFree()">
+        Освободить все расписание
+    </button>
+    <button class="btn btn-danger btn-lg" @onclick="() => SetAllTimeTaken()">
+        Закрыть все расписание
+    </button>
+    <p></p>
+    <style>
+    tr.tight { line-height: 0.001rem;}
+    td.tight { line-height: 0.01rem; }
+</style>
 
-
-    @if (TutorSchedule != null)
-    {
+<div class="alert w-75">
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th class="text-center">
+                <h4>ПН</h4>
+            </th>
+            <th class="text-center">
+                <h4>ВТ</h4>
+            </th>
+            <th class="text-center">
+                <h4>СР</h4>
+            </th>
+            <th class="text-center">
+                <h4>ЧТ</h4>
+            </th>
+            <th class="text-center">
+                <h4>ПТ</h4>
+            </th>
+            <th class="text-center">
+                <h4>СБ</h4>
+            </th>
+            <th class="text-center">
+                <h4>ВС</h4>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
         @foreach (var lesson in LessonTime)
         {
             var j = LessonTime.IndexOf(lesson);
-            <tr>
+            <tr class="tight">
                 @foreach (var day in TutorSchedule.FreeTimeSchedule)
-                        {
-                            var i = TutorSchedule.FreeTimeSchedule.IndexOf(day);
-                            @switch (TutorSchedule?.FreeTimeSchedule[i].DaySchedule[j].ToString())
-                            {
-                                case "True":
-                                    <td>
-                                        <blockquote class="blockquote text-center">
-                                            <button class="btn btn-success btn-sm" @onclick="() => SetTimeTaken(i, j)">
-                                                @lesson
-                                            </button>
-                                        </blockquote>
-                                    </td>
-                                    break;
-                                case "False":
-                                    <td>
-                                        <blockquote class="blockquote text-center" @onclick="() => SetTimeFree(i, j)">
-                                            <button class="btn btn-secondary btn-sm">
-                                                @lesson
-                                            </button>
-                                        </blockquote>
-                                    </td>
-                                    break;
-                            }
-                        }
+                {
+                    var i = TutorSchedule.FreeTimeSchedule.IndexOf(day);
+                    @switch (TutorSchedule?.FreeTimeSchedule[i].DaySchedule[j].ToString())
+                    {
+                        case "True":
+                            <td>
+                                <blockquote class="blockquote text-center">
+                                    <button class="btn btn-success btn-lg" @onclick="() => SetTimeTaken(i, j)">
+                                        @lesson
+                                    </button>
+                                </blockquote>
+                            </td>
+                            break;
+                        case "False":
+                            <td>
+                                <blockquote class="blockquote text-center" @onclick="() => SetTimeFree(i, j)">
+                                    <button class="btn btn-secondary btn-lg">
+                                        @lesson
+                                    </button>
+                                </blockquote>
+                            </td>
+                            break;
+                    }
+                }
+
             </tr>
         }
-        
-    }
-    
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 @code {
     [Parameter]
@@ -109,7 +130,11 @@
         }
     }
 
-    
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("http://localhost:5000/login");
+    }
+
     private async Task SetAllTimeTaken()
     {
         var uri = ScheduleStart + $"{UserId}/setAllTimeTaken";

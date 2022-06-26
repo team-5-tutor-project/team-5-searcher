@@ -6,7 +6,11 @@
 @inject HttpClient _http
 
 <PageTitle>Blacklist</PageTitle>
-
+<button class="btn btn-warning" style="float: right" @onclick="() => NavigateToHome()">
+    Домой
+</button>
+<br>
+<br>
 <h1>Черный список</h1>
 
 @if (_tutorsToShowList == null || _tutorsToShowList.Count == 0)
@@ -140,5 +144,10 @@ else
             }
         }
         _message = "У вас пока нет репетиторов в Черном списке";
+    }
+    
+    private void NavigateToHome()
+    {
+        _navigationManager.NavigateTo("http://localhost:5000/login");
     }
 }

@@ -6,7 +6,11 @@
 @inject HttpClient _http
 
 <PageTitle>Favorites</PageTitle>
-
+<button class="btn btn-warning" style="float: right" @onclick="() => NavigateToHome()">
+    Домой
+</button>
+<br>
+<br>
 <h1>Избранное</h1>
 
 @if (_tutorsToShowList == null || _tutorsToShowList.Count == 0)
@@ -138,5 +142,10 @@ else
             }
         }
         _message = "У вас пока нет репетиторов в Избранном";
+    }
+    
+    private void NavigateToHome()
+    {
+        _navigationManager.NavigateTo("http://localhost:5000/login");
     }
 }

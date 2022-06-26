@@ -16,7 +16,7 @@
 - Редактирование расписания репетитора 
 
 ### Модуль связан с другими модулями следующим образом:
-- С [Аккаунтом](https://github.com/team-5-tutor-project/team-5-account) модуль взаимодействует во время запроса ссылки на чат по имеющемуся ID.
+- С [Аккаунтом](https://github.com/team-5-tutor-project/team-5-account) модуль взаимодействует во время перехода из аккаунта в поисковик/избранное/черный список/расписание и обратно по имеющемуся ID.
 - С [Мессенджером](https://github.com/team-5-tutor-project/team-5-messenger) модуль взаимодействует во время запроса ссылки на чат по имеющемуся ID.
 
 ###
@@ -25,10 +25,10 @@
 
 ### Backend
 
-- Реализован http-сервер 
-- Подключение к базе данных
+- Реализован http-сервер с помощью библиотеки **Microsoft.AspNetCore.Mvc**
+- Подключение к базе данных и конфигурация осуществляются на базе библиотеки **Microsoft.Extensions.Configuration**
+- Используется **Mapper** для работы с DTO
 - Используется [Swagger](http://localhost:6001/swagger/index.html) для тестирования реализуемых методов и взаимодействия с БД
-
 
 ### Frontend
 
@@ -37,7 +37,7 @@
 
 ## Front
 
-### Посмотреть реализацию проекта можно по [ссылке](https://github.com/team-5-tutor-project/team-5-searcher/tree/main/Front)
+### Посмотреть реализацию проекта можно по [ссылке](https://tutor-project-account.herokuapp.com)
 
 ### Страница поиска
 ![image](https://user-images.githubusercontent.com/79813229/175834647-e8e76ca4-9eb7-486f-806b-c99b3f5e5e80.png)
@@ -56,7 +56,7 @@
 ![image](https://user-images.githubusercontent.com/79813229/175834719-e181171b-b56e-4d48-a869-c47ef17d48af.png)
 ![image](https://user-images.githubusercontent.com/79813229/175834741-d5ec98ec-816e-440a-ba2c-76ea89dfac3e.png)
 
-### Страница редоктирования расписания репетитора
+### Страница редактирования расписания репетитора
 ![image](https://user-images.githubusercontent.com/79813229/175834983-b24b8173-c546-448b-ab00-dbbe0e847819.png)
 
 ## Instruction
@@ -78,9 +78,11 @@
 
 ### Текущий [Список задач](https://github.com/team-5-tutor-project/team-5-searcher/issues)
 
-Team-lead
-[Анна Комова](https://github.com/Anny-waay)
+[<img src="https://avatars.githubusercontent.com/u/79156521?v=4" width="100px;"/> <br>
+Анна Комова](https://github.com/Anny-waay) Team-lead
 
-[Татьяна Голякова](https://github.com/tatia2501)
+[<img src="https://avatars.githubusercontent.com/u/79813229?v=4" width="100px;"/> <br>
+Татьяна Голякова](https://github.com/tatia2501)
 
-[Мария Тетерина](https://github.com/MairianeT)
+[<img src="https://avatars.githubusercontent.com/u/79722210?v=4" width="100px;"/> <br>
+Мария Тетерина](https://github.com/MairianeT)

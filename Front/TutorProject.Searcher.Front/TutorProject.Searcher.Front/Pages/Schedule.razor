@@ -5,66 +5,100 @@
 
 <PageTitle>Schedule</PageTitle>
 
-<h2>Расписание</h2>
-
-<h3>@TutorSchedule?.Tutor.Name</h3>
-<h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PricePerHour ₽</h5>
-<p>@TutorSchedule?.Tutor.Description</p>
-@if (ClientId == TutorId)
+@if (TutorSchedule != null)
 {
-    <a href="http://localhost:7000/search/schedule-editor/@Token" class="card-link" >Редактировать расписание</a>
-}
-else
-{
-    <a href="#" class="card-link" >Начать чат</a>
-}
+    <div>
+        <h2 style="word-spacing: 6px"><strong>@TutorSchedule?.Tutor.Name</strong> @TutorSchedule?.Tutor.PricePerHour₽</h2>
+        @switch (@TutorFormat)
+        {
+            case "TutorHome":
+                <h5 class="mb-2 text-muted">Дома у репетитора</h5>
+                break;
+            case "ClientHome":
+                <h5 class="mb-2 text-muted">Дома у Вас</h5>
+                break;
+            case "Online":
+                <h5 class="mb-2 text-muted">Онлайн</h5>
+                break;
+        }
+        <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PupilMinClass - @TutorSchedule?.Tutor.PupilMaxClass классы</h5>
+    </div>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th class="text-center">Понедельник</th>
-        <th class="text-center">Вторник</th>
-        <th class="text-center">Среда</th>
-        <th class="text-center">Четверг</th>
-        <th class="text-center">Пятница</th>
-        <th class="text-center">Суббота</th>
-        <th class="text-center">Воскресенье</th>
-    </tr>
-    </thead>
-    <tbody>
-    
-    @for (var i = 0; i < 12; i++)
-    {
-        <tr>
-            @for (var j = 0; j < 7; j++)
+    <br>
+    <br>
+    <div>
+        <h5><strong>Описание</strong></h5> 
+        <h6>@TutorSchedule?.Tutor.Description</h6>
+
+        <a href="#" class="card-link"><br>Начать чат</a>
+    </div>
+    <br>
+<br>
+    <h5><strong>Расписание</strong></h5>
+    <style>
+    tr.tight { line-height: 0.001rem;}
+    td.tight { line-height: 0.01rem; }
+</style>
+
+    <div class="alert w-50">
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th class="text-center">
+                    ПН
+                </th>
+                <th class="text-center">
+                    ВТ
+                </th>
+                <th class="text-center">
+                    СР
+                </th>
+                <th class="text-center">
+                    ЧТ
+                </th>
+                <th class="text-center">
+                    ПТ
+                </th>
+                <th class="text-center">
+                    СБ
+                </th>
+                <th class="text-center">
+                    ВС
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var lesson in LessonTime)
             {
-                @switch (TutorSchedule?.FreeTimeSchedule[j].DaySchedule[i].ToString())
-                {
-                    case "True":
-                        <td>
-                            <blockquote class="blockquote text-center">
-                                <button class="btn btn-success btn-sm">
-                                    @LessonTime[i]
-                                </button>
-                            </blockquote>
-                        </td>
-                        break;
-                    case "False":
-                        <td>
-                            <blockquote class="blockquote text-center">
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    @LessonTime[i]
-                                </button>
-                            </blockquote>
-                        </td>
-                        break;
-                    
-                }
+                var j = LessonTime.IndexOf(lesson);
+                <tr class="tight">
+                    @foreach (var day in TutorSchedule.FreeTimeSchedule)
+                    {
+                        var i = TutorSchedule.FreeTimeSchedule.IndexOf(day);
+                        @switch (TutorSchedule?.FreeTimeSchedule[i].DaySchedule[j].ToString())
+                        {
+                            case "True":
+                                <td class="tight">
+                                    <div class="alert alert-success text-center" role="alert">
+                                        @lesson
+                                    </div>
+                                </td>
+                                break;
+                            case "False":
+                                <td class="tight">
+                                    <div class="alert alert-secondary text-center" role="alert">
+                                        @lesson
+                                    </div>
+                                </td>
+                                break;
+                        }
+                    }
+                </tr>
             }
-        </tr>
-    }
-    </tbody>
-</table>
+            </tbody>
+        </table>
+    </div>
+}
 
 @code {
 
@@ -79,6 +113,7 @@ else
     private ScheduleResult? TutorSchedule { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
     private string ScheduleStart { get; set; } = "http://localhost:6001/schedule/";
+    private string TutorFormat { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -98,6 +133,7 @@ else
         {
             LessonTime.Add((i + 9).ToString() + ":00");
         }
+        TutorFormat = TutorSchedule.Tutor.WorkFormat.ToString();
     }
     
     private void StartChat(string? tutorId)

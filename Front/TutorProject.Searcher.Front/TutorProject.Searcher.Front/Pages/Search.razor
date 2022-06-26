@@ -10,95 +10,122 @@
 
 <h1>Поиск</h1>
 
-<div class="col-12">
-    <h3><b>Задайте параметры</b></h3>
+@if (!IsParam)
+{
+    <div align="right">
+        <label> <h4> Добавить параметры поиска </h4></label>
+        <button @onclick="ShowParameters">+</button>
+    </div>
+}
+else
+{
+        <div align="right">
+        <label> <h4> Скрыть параметры поиска </h4></label>
+        <button @onclick="HideParameters">-</button>
+    </div>
+    
+    <div class="col-12">
+    <h5><b>Задайте параметры</b></h5>
     <hr />
     
     <EditForm Model="@TutorToSearch" OnValidSubmit="@SearchTutor">
         
         <div>
-            <label class="col-2 font-weight-bold">дни занятий: </label>
-            <label>
-                понедельник:
-                <InputCheckbox @bind-Value="@TutorToSearch.Monday" />
-            </label>
-            <label>
-                вторник:
-                <InputCheckbox @bind-Value="@TutorToSearch.Tuesday" />
-            </label>
-            <label>
-                среда:
-                <InputCheckbox @bind-Value="@TutorToSearch.Wednesday" />
-            </label>
-            <label>
-                четверг:
-                <InputCheckbox @bind-Value="@TutorToSearch.Thursday" />
-            </label>
-            <label>
-                пятница:
-                <InputCheckbox @bind-Value="@TutorToSearch.Friday" />
-            </label>
-            <label>
-                суббота:
-                <InputCheckbox @bind-Value="@TutorToSearch.Saturday" />
-            </label>
-            <label>
-                воскресенье:
-                <InputCheckbox @bind-Value="@TutorToSearch.Sunday" />
-            </label>
+            <label>Предмет: </label>
+            <InputText @bind-Value="TutorToSearch.Subject" />
+            <button @onclick="@(()=> Clean("subject"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">предмет: </label>
-            <InputText @bind-Value="TutorToSearch.Subject" class="form-control col-3" />
+        <div >
+            <label>Минимальная цена: </label>
+            <InputNumber @bind-Value="TutorToSearch.MinPrice" />
+            <button @onclick="@(()=> Clean("minprace"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">минимальная цена: </label>
-            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.MinPrice" />
+        <div>
+            <label >Максимальная цена: </label>
+            <InputNumber @bind-Value="TutorToSearch.MaxPrice" />
+            <button @onclick="@(()=> Clean("maxprice"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">максимальная цена: </label>
-            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.MaxPrice" />
+        <div>
+            <label >Класс обучения: </label>
+            <InputNumber @bind-Value="TutorToSearch.PupilClass" />
+            <button @onclick="@(()=> Clean("pupilclass"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">класс обучения: </label>
-            <InputNumber class="form-control col-3" @bind-Value="TutorToSearch.PupilClass" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">формат работы: </label>
-            <InputSelect @bind-Value="TutorToSearch.WorkFormat" class="form-check.control col-3">
+        <div>
+            <label>Формат работы: </label>
+            <InputSelect @bind-Value="TutorToSearch.WorkFormat">
                 @foreach (var format in Formats)
                 {
                     <option value="@format">@format</option>
                 }
             </InputSelect>
+            <button @onclick="@(()=> Clean("workformat"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">сортировка: </label>
-            <InputSelect @bind-Value="TutorToSearch.TutorsOrder" class="form-check.control col-3">
+        <div>
+            <label>Сортировка: </label>
+            <InputSelect @bind-Value="TutorToSearch.TutorsOrder">
                 @foreach (var order in Orders)
                 {
                     <option value="@order">@order</option>
                 }
             </InputSelect>
+            <button @onclick="@(()=> Clean("order"))">очистить</button>
         </div>
         <br />
-        <div class="col-12 row">
+        <div style="word-spacing: 6px">
+            <label>Дни занятий: </label>
+            <br />
+            <label style="word-spacing: 0px">
+                понедельник:
+                <InputCheckbox @bind-Value="@TutorToSearch.Monday" />
+            </label>
+            <label style="word-spacing: 0px">
+                вторник:
+                <InputCheckbox @bind-Value="@TutorToSearch.Tuesday" />
+            </label>
+            <label style="word-spacing: 0px">
+                среда:
+                <InputCheckbox @bind-Value="@TutorToSearch.Wednesday" />
+            </label>
+            <label style="word-spacing: 0px">
+                четверг:
+                <InputCheckbox @bind-Value="@TutorToSearch.Thursday" />
+            </label>
+            <label style="word-spacing: 0px">
+                пятница:
+                <InputCheckbox @bind-Value="@TutorToSearch.Friday" />
+            </label>
+            <label style="word-spacing: 0px">
+                суббота:
+                <InputCheckbox @bind-Value="@TutorToSearch.Saturday" />
+            </label>
+            <label style="word-spacing: 0px">
+                воскресенье:
+                <InputCheckbox @bind-Value="@TutorToSearch.Sunday" />
+            </label>
+        </div>
+        <br />
+        <div>
             <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn-primary" @onclick="@(()=> SearchTutor())" value="Поиск" />
+            <input type="submit" class="form-control col-1 btn-primary" @onclick="@(()=> SearchTutor())" value="Применить" />
             <span>&nbsp;</span>
         </div>
         
     </EditForm>
 </div>
 <br />
+}
 
-<div class = "alert w-auto">
+<h3> Репетиторы: </h3>
+
+<p>@Message</p>
+
+@if (@IsTable){
+    <div class = "alert w-auto">
         <table class="table table-sm table-hover">
             <thead class="table-bordered border-top-0">
             <tr>
@@ -170,13 +197,14 @@
                     <td><div class="text-center">
                             @tut.Subjects
                         </div>
-                        </td>
+                    </td>
                     <td><div class="text-center"><a href="/Additional-information/@tut.Tutor.Id/@Token">Посмотреть</a></div></td>
                 </tr>
             }
             </tbody>
         </table>
     </div>
+}
 
 @code {
     [Parameter]
@@ -189,14 +217,20 @@
     private string[]? Orders { get; set; }
     private string[]? Formats { get; set; }
     private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
+    private bool IsParam { get; set; }
+    private bool IsTable { get; set; }
+    private string Message { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         TutorToSearch = new TutorToSearch();
-        Orders = new[] {"RisingPrice", "DownwardPrice", ""};
-        Formats = new[] {"Online", "ClientHome", "TutorHome", ""};
+        Orders = new[] {"По возрастанию цены", "По убыванию цены", ""};
+        Formats = new[] {"Онлайн", "Дома у вас", "Дома у репетитора", ""};
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
+        IsParam = false;
+        IsTable = true;
+        Message = "Загрузка...";
 
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         if (authoResponse.StatusCode == HttpStatusCode.BadRequest)
@@ -211,18 +245,31 @@
         }        
 
         ClientID = User.UserId.ToString();
+        
         var tutorsResponse = await Http.GetAsync(SearchStart + $"{ClientID}/getAllTutors");
-        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
-        foreach (var tutor in TutorsList)
+        if (tutorsResponse.StatusCode == HttpStatusCode.NotFound)
         {
-            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
-            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
-            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            TutorsToShowList = new List<TutorToShow>();
+            Message = "По вашему запросу ничего не найдено :(";
+            IsTable = false;
+        }
+        else
+        {
+            IsTable = true;
+            TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+            foreach (var tutor in TutorsList)
+            {
+                var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
+                var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+                TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            }
+            Message = "";
         }
     }
     
     private async Task SearchTutor()
     {
+        Message = "Загрузка...";
         string request = SearchStart + $"{ClientID}/search?";
         bool isFirst = true;
         if (TutorToSearch.Subject != "")
@@ -266,15 +313,46 @@
                    $"&Schedule={TutorToSearch.Friday}&Schedule={TutorToSearch.Saturday}&Schedule={TutorToSearch.Sunday}";
         
         var tutorsResponse = await Http.GetAsync(request);
-        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
-        TutorsToShowList = new List<TutorToShow>();
-        var result = new List<TutorToShow>();
-        foreach (var tutor in TutorsList)
+        if (tutorsResponse.StatusCode == HttpStatusCode.NotFound)
         {
-            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
-            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
-            result.Add(new TutorToShow(tutor, subjects));
+            TutorsToShowList = new List<TutorToShow>();
+            Message = "По вашему запросу ничего не найдено :(";
+            IsTable = false;
         }
-        TutorsToShowList = result;
+        else
+        {
+            IsTable = true;
+            TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+            TutorsToShowList = new List<TutorToShow>();
+            var result = new List<TutorToShow>();
+            foreach (var tutor in TutorsList)
+            {
+                var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
+                var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+                result.Add(new TutorToShow(tutor, subjects));
+            }
+            TutorsToShowList = result;
+            Message = "";
+        }
+    }
+    
+    private void ShowParameters()
+    {
+        IsParam = true;
+    }
+    
+    private void HideParameters()
+    {
+        IsParam = false;
+    }
+
+    private void Clean(string type)
+    {
+        if (type == "subject") TutorToSearch.Subject = "";
+        if (type == "minprice") TutorToSearch.MinPrice = 0;
+        if (type == "maxprice") TutorToSearch.MaxPrice = 0;
+        if (type == "pupilclass") TutorToSearch.PupilClass = 0;
+        if (type == "workformat") TutorToSearch.WorkFormat = "";
+        if (type == "order") TutorToSearch.TutorsOrder = "";
     }
 }

@@ -10,7 +10,15 @@
 @if (TutorSchedule != null)
 {
     <div>
-        <h2 style="word-spacing: 6px"><strong>@TutorSchedule?.Tutor.Name</strong> @TutorSchedule?.Tutor.PricePerHour₽ </h2>
+        @if (TutorSchedule?.Tutor.PricePerHour == 0)
+        {
+            <h2><strong>@TutorSchedule?.Tutor.Name</strong></h2>
+        }
+        else
+        {
+            <h2 style="word-spacing: 6px"><strong>@TutorSchedule?.Tutor.Name</strong> @TutorSchedule?.Tutor.PricePerHour₽ </h2>
+
+        }
         @if (TutorSubjects != null)
         {
             <div>

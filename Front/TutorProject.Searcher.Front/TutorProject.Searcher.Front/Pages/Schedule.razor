@@ -6,69 +6,144 @@
 @inject HttpClient Http
 
 <PageTitle>Schedule</PageTitle>
-
-<h2>Расписание</h2>
-
-<button class="btn btn-primary" @onclick="@(()=> StartChat())">Начать чат</button>
-
-<h3>@TutorSchedule?.Tutor.Name</h3>
-<h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PricePerHour ₽</h5>
-<p>@TutorSchedule?.Tutor.Description</p>
-@if (ClientId == TutorId)
+@if (TutorSchedule != null)
 {
-    <a href="http://localhost:7000/search/schedule-editor/@Token" class="card-link" >Редактировать расписание</a>
-}
-else
-{
-    <a href="#" class="card-link" >Начать чат</a>
-}
-
-<table class="table">
-    <thead>
-    <tr>
-        <th class="text-center">Понедельник</th>
-        <th class="text-center">Вторник</th>
-        <th class="text-center">Среда</th>
-        <th class="text-center">Четверг</th>
-        <th class="text-center">Пятница</th>
-        <th class="text-center">Суббота</th>
-        <th class="text-center">Воскресенье</th>
-    </tr>
-    </thead>
-    <tbody>
-    
-    @for (var i = 0; i < 12; i++)
-    {
-        <tr>
-            @for (var j = 0; j < 7; j++)
-            {
-                @switch (TutorSchedule?.FreeTimeSchedule[j].DaySchedule[i].ToString())
+    <div>
+        <h2 style="word-spacing: 6px"><strong>@TutorSchedule?.Tutor.Name</strong> @TutorSchedule?.Tutor.PricePerHour₽ </h2>
+        @if (TutorSubjects != null)
+        {
+            <div>
+                @foreach (var sub in TutorSubjects)
                 {
-                    case "True":
-                        <td>
-                            <blockquote class="blockquote text-center">
-                                <button class="btn btn-success btn-sm">
-                                    @LessonTime[i]
-                                </button>
-                            </blockquote>
-                        </td>
-                        break;
-                    case "False":
-                        <td>
-                            <blockquote class="blockquote text-center">
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    @LessonTime[i]
-                                </button>
-                            </blockquote>
-                        </td>
-                        break;
-                    
+                    <h4>@sub </h4>
                 }
-            }
-        </tr>
+            </div>
+        }
+        
+        
+        @switch (@TutorFormat)
+        {
+            case "TutorHome":
+                <h5 class="mb-2 text-muted">Дома у репетитора</h5>
+                break;
+            case "ClientHome":
+                <h5 class="mb-2 text-muted">Дома у Вас</h5>
+                break;
+            case "Online":
+                <h5 class="mb-2 text-muted">Онлайн</h5>
+                break;
+        }
+        <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PupilMinClass - @TutorSchedule?.Tutor.PupilMaxClass классы</h5>
+    </div>
+
+    
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        @switch(InFav)
+        {
+            case true:
+                <button class="btn btn-danger" @onclick="@(()=> DeleteFromFavorites())"> 
+                    <h5 style="height: 14px;">❤️</h5>
+                </button>
+                break;
+            case false:
+                <button class="btn btn-outline-danger" @onclick="@(()=> AddToFavorites())"> 
+                    <h5 style="height: 14px;">❤️</h5>
+                </button>
+                break;
+        }
+        @switch (InBL)
+        {
+            case true:
+                <button class="btn btn-dark" @onclick="@(() => DeleteFromBlacklist())">
+                    <h6 style="height: 12px;">ЧС</h6>
+                </button>
+                break;
+            case false:
+                <button class="btn btn-outline-dark" @onclick="@(() => AddToBlackList())">
+                    <h6 style="height: 12px;">ЧС</h6>
+                </button>
+                break;
+        }
+        <button class="btn btn-outline-primary" @onclick="@(() => StartChat())">
+            <h6 style="height: 12px;">Начать чат</h6>
+        </button>
+    </div>
+    <br>
+    <br>
+    @if (TutorSchedule.Tutor.Description != null)
+    {
+        <div>
+            <h5><strong>Описание</strong></h5> 
+            <h6>@TutorSchedule?.Tutor.Description</h6>
+        </div>
     }
-    </tbody>
-</table>
+    <br>
+<br>
+    <h5><strong>Расписание</strong></h5>
+    <style>
+    tr.tight { line-height: 0.001rem;}
+    td.tight { line-height: 0.01rem; }
+</style>
+
+    <div class="alert w-50">
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th class="text-center">
+                    ПН
+                </th>
+                <th class="text-center">
+                    ВТ
+                </th>
+                <th class="text-center">
+                    СР
+                </th>
+                <th class="text-center">
+                    ЧТ
+                </th>
+                <th class="text-center">
+                    ПТ
+                </th>
+                <th class="text-center">
+                    СБ
+                </th>
+                <th class="text-center">
+                    ВС
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var lesson in LessonTime)
+            {
+                var j = LessonTime.IndexOf(lesson);
+                <tr class="tight">
+                    @foreach (var day in TutorSchedule.FreeTimeSchedule)
+                    {
+                        var i = TutorSchedule.FreeTimeSchedule.IndexOf(day);
+                        @switch (TutorSchedule?.FreeTimeSchedule[i].DaySchedule[j].ToString())
+                        {
+                            case "True":
+                                <td class="tight">
+                                    <div class="alert alert-success text-center" role="alert">
+                                        @lesson
+                                    </div>
+                                </td>
+                                break;
+                            case "False":
+                                <td class="tight">
+                                    <div class="alert alert-secondary text-center" role="alert">
+                                        @lesson
+                                    </div>
+                                </td>
+                                break;
+                        }
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
 
 @code {
 
@@ -81,9 +156,15 @@ else
     private AuthorizedUser User { get; set; }
     private string ClientId { get; set; }
     private ScheduleResult? TutorSchedule { get; set; }
+    private List<string>? TutorSubjects { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
     private string Start { get; set; } = "http://localhost:6001/";
     private string ScheduleStart { get; set; } = "http://localhost:6001/schedule/";
+    private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
+    private string ListsStart { get; set; } = "http://localhost:6001/";
+    private string TutorFormat { get; set; }
+    private bool InFav { get; set; }
+    private bool InBL { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -103,39 +184,60 @@ else
         {
             LessonTime.Add((i + 9).ToString() + ":00");
         }
+        TutorFormat = TutorSchedule.Tutor.WorkFormat.ToString();
+        
+        var uri = ListsStart + $"favorites/{ClientId}/checkTutorInFavorites?tutorId={TutorId}";
+        var responseMessage = await Http.GetAsync(uri);
+        InFav = (responseMessage.Content.ReadFromJsonAsync<bool>().Result);
+        
+        uri = ListsStart + $"blacklist/{ClientId}/checkTutorInBlacklist?tutorId={TutorId}";
+        responseMessage = await Http.GetAsync(uri);
+        InBL = (responseMessage.Content.ReadFromJsonAsync<bool>().Result);
+        
+        var subjResponse = await Http.GetAsync(SearchStart + $"{TutorId}/getAllSubjects");
+        var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+        TutorSubjects = subjects;
     }
     
-    private async Task DeleteFromFavorites(Guid tutorId)
+        
+    private async Task AddToBlackList()
     {
-        await Http.DeleteAsync(Start + $"favorites/{ClientId}/deleteTutorFromFavorites?tutorId={tutorId}");
-    }
-    
-    private async Task DeleteFromBlacklist(Guid tutorId)
-    {
-        await Http.DeleteAsync(Start + $"blacklist/{ClientId}/deleteTutorFromBlacklist?tutorId={tutorId}");
-    }
-    
-    private async Task AddToBlackList(string tutorId)
-    {
-        var uri = Start + $"blacklist/{ClientId}/addTutorToBlacklist?tutorId={tutorId}";
-        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(tutorId)};
+        InBL = true;
+        InFav = false;
+        var uri = ListsStart + $"blacklist/{ClientId}/addTutorToBlacklist?tutorId={TutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(TutorId)};
         string json = JsonConvert.SerializeObject(clientToTutor);
         HttpContent content = new StringContent(json);
         await Http.PostAsync(uri, content);
     }
     
-    private async Task AddToFavourites(string tutorId)
+    private async Task DeleteFromBlacklist()
     {
-        var uri = Start + $"favorites/{ClientId}/addTutorToFavorites?tutorId={tutorId}";
-        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(tutorId)};
+        InBL = false;
+        await Http.DeleteAsync(ListsStart + $"blacklist/{ClientId}/deleteTutorFromBlacklist?tutorId={TutorId}");
+    }
+
+    
+    private async Task AddToFavorites()
+    {
+        InFav = true;
+        InBL = false;
+        var uri = ListsStart + $"favorites/{ClientId}/addTutorToFavorites?tutorId={TutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(TutorId)};
         string json = JsonConvert.SerializeObject(clientToTutor);
         HttpContent content = new StringContent(json);
         await Http.PostAsync(uri, content);
     }
-    
+
+    private async Task DeleteFromFavorites()
+    {
+        InFav = false;
+        var responseMessage = await Http.DeleteAsync(ListsStart + $"favorites/{ClientId}/deleteTutorFromFavorites?tutorId={TutorId}");
+    }
+
     private async Task StartChat()
     {
-        var uri = "http://locallhost:8000/v1/chats/default";
+        var uri = "http://localhost:8000/v1/chats/default";
         var chat = new Chat {user_name_first = TutorId, user_name_second = ClientId, chat_name = $"{TutorId},{ClientId}"};
         string json = JsonConvert.SerializeObject(chat);
         HttpContent content = new StringContent(json);

@@ -15,6 +15,38 @@
     
     <EditForm Model="@TutorToSearch" OnValidSubmit="@SearchTutor">
         
+        <div>
+            <label class="col-2 font-weight-bold">дни занятий: </label>
+            <label>
+                понедельник:
+                <InputCheckbox @bind-Value="@TutorToSearch.Monday" />
+            </label>
+            <label>
+                вторник:
+                <InputCheckbox @bind-Value="@TutorToSearch.Tuesday" />
+            </label>
+            <label>
+                среда:
+                <InputCheckbox @bind-Value="@TutorToSearch.Wednesday" />
+            </label>
+            <label>
+                четверг:
+                <InputCheckbox @bind-Value="@TutorToSearch.Thursday" />
+            </label>
+            <label>
+                пятница:
+                <InputCheckbox @bind-Value="@TutorToSearch.Friday" />
+            </label>
+            <label>
+                суббота:
+                <InputCheckbox @bind-Value="@TutorToSearch.Saturday" />
+            </label>
+            <label>
+                воскресенье:
+                <InputCheckbox @bind-Value="@TutorToSearch.Sunday" />
+            </label>
+        </div>
+        <br />
         <div class="col-12 row">
             <label class="col-2 font-weight-bold">предмет: </label>
             <InputText @bind-Value="TutorToSearch.Subject" class="form-control col-3" />
@@ -114,7 +146,7 @@
     private string[]? Formats { get; set; }
     private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
     private string ListsStart { get; set; } = "http://localhost:6001/";
-    
+
     protected override async Task OnInitializedAsync()
     {
         TutorToSearch = new TutorToSearch();
@@ -143,48 +175,48 @@
     
     private async Task SearchTutor()
     {
-        string request = SearchStart + $"{ClientID}/getAllTutors";
-        if (TutorToSearch.Subject != "" || TutorToSearch.WorkFormat != "" 
-            || TutorToSearch.MinPrice != 0 || TutorToSearch.MaxPrice != 0 
-            || TutorToSearch.PupilClass != 0 || TutorToSearch.TutorsOrder != "")
+        string request = SearchStart + $"{ClientID}/search?";
+        bool isFirst = true;
+        if (TutorToSearch.Subject != "")
         {
-            bool isntFirst = false;
-            request = SearchStart + $"{ClientID}/search?";
-            if (TutorToSearch.Subject != "")
-            {
-                request += $"Subject={TutorToSearch.Subject}";
-                isntFirst = true;
-            }
-            if (TutorToSearch.WorkFormat != "")
-            {
-                if (isntFirst) request += "&";
-                request += $"WorkFormat={Array.IndexOf(Formats, TutorToSearch.WorkFormat)}";
-                isntFirst = true;
-            }
-            if (TutorToSearch.MinPrice != 0)
-            {
-                if (isntFirst) request += "&";
-                request += $"MinPrice={TutorToSearch.MinPrice}";
-                isntFirst = true;
-            }
-            if (TutorToSearch.MaxPrice != 0)
-            {
-                if (isntFirst) request += "&";
-                request += $"MaxPrice={TutorToSearch.MaxPrice}";
-                isntFirst = true;
-            }
-            if (TutorToSearch.PupilClass != 0)
-            {
-                if (isntFirst) request += "&";
-                request += $"PupilClass={TutorToSearch.PupilClass}";
-                isntFirst = true;
-            }
-            if (TutorToSearch.TutorsOrder != "")
-            {
-                if (isntFirst) request += "&";
-                request += $"TutorsOrder={Array.IndexOf(Orders, TutorToSearch.TutorsOrder)}";
-            }
+            request += $"Subject={TutorToSearch.Subject}";
+            isFirst = false;
         }
+        if (TutorToSearch.WorkFormat != "")
+        {
+            if (!isFirst) request += "&";
+            request += $"WorkFormat={Array.IndexOf(Formats, TutorToSearch.WorkFormat)}";
+            isFirst = false;
+        }
+        if (TutorToSearch.MinPrice != 0)
+        {
+            if (!isFirst) request += "&";
+            request += $"MinPrice={TutorToSearch.MinPrice}";
+            isFirst = false;
+        }
+        if (TutorToSearch.MaxPrice != 0)
+        {
+            if (!isFirst) request += "&";
+            request += $"MaxPrice={TutorToSearch.MaxPrice}";
+            isFirst = false;
+        }
+        if (TutorToSearch.PupilClass != 0)
+        {
+            if (!isFirst) request += "&";
+            request += $"PupilClass={TutorToSearch.PupilClass}";
+            isFirst = false;
+        }
+        if (TutorToSearch.TutorsOrder != "")
+        {
+            if (!isFirst) request += "&";
+            request += $"TutorsOrder={Array.IndexOf(Orders, TutorToSearch.TutorsOrder)}";
+            isFirst = false;
+        }
+        if (!isFirst) request += "&";
+        request += $"Schedule={TutorToSearch.Monday}&Schedule={TutorToSearch.Tuesday}" +
+                   $"&Schedule={TutorToSearch.Wednesday}&Schedule={TutorToSearch.Thursday}" +
+                   $"&Schedule={TutorToSearch.Friday}&Schedule={TutorToSearch.Saturday}&Schedule={TutorToSearch.Sunday}";
+        
         var tutorsResponse = await Http.GetAsync(request);
         TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
         TutorsToShowList = new List<TutorToShow>();

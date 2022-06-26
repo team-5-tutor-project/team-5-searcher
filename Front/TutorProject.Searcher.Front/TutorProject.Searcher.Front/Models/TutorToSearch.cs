@@ -8,12 +8,26 @@ public class TutorToSearch
     public int MaxPrice { get; set; }
     public int PupilClass { get; set; }
     public string TutorsOrder { get; set; }
-    //public List<bool> Schedule { get; set; }
+    
+    public bool Monday { get; set; }
+    public bool Tuesday { get; set; }
+    public bool Wednesday { get; set; }
+    public bool Thursday { get; set; }
+    public bool Friday { get; set; }
+    public bool Saturday { get; set; }
+    public bool Sunday { get; set; }
 
     public TutorToSearch()
     {
         Subject = "";
         WorkFormat = "";
         TutorsOrder = "";
+        Monday = true;
+        Tuesday = true;
+        Wednesday = true;
+        Thursday = true;
+        Friday = true;
+        Saturday = true;
+        Sunday = true;
     }
 }

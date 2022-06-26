@@ -1,6 +1,7 @@
 ﻿@page "/Additional-information/{tutorId}/{token}"
 @using TutorProject.Searcher.Front.Models
 @using Newtonsoft.Json
+@using System.Net
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -213,10 +214,26 @@
     {
         InFav = false;
         var responseMessage = await Http.DeleteAsync(ListsStart + $"favorites/{ClientId}/deleteTutorFromFavorites?tutorId={TutorId}");
-    }
-
-    private void StartChat()
+    
+        private async Task StartChat()
     {
+        var uri = "http://locallhost:8000/v1/chats/default";
+        var chat = new Chat {user_name_first = TutorId, user_name_second = ClientId, chat_name = $"{TutorId},{ClientId}"};
+        string json = JsonConvert.SerializeObject(chat);
+        HttpContent content = new StringContent(json);
+        var result = await Http.PostAsync(uri, content);
+        ReceivedChat receivedChat = result.Content.ReadFromJsonAsync<ReceivedChat>().Result;
         
+        var response = await Http.GetAsync($"http://localhost:4000/api/chats/{receivedChat.chatId}?token={Token}");
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+        {
+            uri = $"http://localhost:4000/api/chats?token={Token}";
+            var chatDto = new ChatDto {ChatID = new Guid(receivedChat.chatId), ClientID = new Guid(ClientId), TutorID = new Guid(TutorId)};
+            json = JsonConvert.SerializeObject(chatDto);
+            content = new StringContent(json);
+            await Http.PostAsync(uri, content);
+        }
+
+        NavigationManager.NavigateTo($"http://localhost:9000/chat/{receivedChat.chatId}/{Token}");
     }
 }

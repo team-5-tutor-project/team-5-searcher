@@ -1,5 +1,6 @@
-@page "/Favorites/{Token}"
+@page "/Favorites/{token}"
 @using Microsoft.AspNetCore.Components
+@using Syncfusion.Blazor.Grids
 @using TutorProject.Searcher.Front.Models
 @inject NavigationManager _navigationManager
 @inject HttpClient _http
@@ -14,64 +15,109 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Имя</th>
-            <th>Формат работы</th>
-            <th>Описание</th>
-            <th>Цена за час</th>
-            <th>Классы обучения</th>
-            <th>Предметы</th>
-            <th></th>
-            <th></th>
+    <SfGrid DataSource="@_tutorsToShowList">
+        <GridColumns>
+            <GridColumn HeaderText="Имя" Width="130">
+                <Template>
+                    @{
+                        var tutor = (context as TutorToShow);
+                        <p>@tutor.Tutor.Name</p>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="Цена за час" Width="130">
+                <Template>
+                    @{
+                        var tutor = (context as TutorToShow);
+                        if (tutor.Tutor.PricePerHour != 0)
+                        {
+                            <p>@tutor.Tutor.PricePerHour</p>
+                        }
+                        else
+                        {
+                            <p>Не указана</p>
+                        }
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="Классы" Width="130">
+                <Template>
+                    @{
+                        var tutor = (context as TutorToShow);
+                        if (tutor.Tutor.PupilMinClass != 0 && tutor.Tutor.PupilMaxClass != 0)
+                        {
+                            <p>@tutor.Tutor.PupilMinClass - @tutor.Tutor.PupilMaxClass</p>
+                        }
+                        else
+                        {
+                            if (tutor.Tutor.PupilMinClass == 0 && tutor.Tutor.PupilMaxClass != 0)
+                            {
+                                <p>Не старше @tutor.Tutor.PupilMaxClass</p>
+                            }
+                            else
+                            {
+                                if (tutor.Tutor.PupilMinClass != 0 && tutor.Tutor.PupilMaxClass == 0)
+                                {
+                                    <p>Не младше @tutor.Tutor.PupilMinClass</p>
+                                }
+                                else
+                                {
+                                    <p>Не указаны</p>
+                                }
+                            }
+                        }
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field=@nameof(TutorToShow.Subjects) HeaderText="Предметы" Width="120"></GridColumn>
+            <GridColumn HeaderText="Подробная информация" TextAlign="TextAlign.Center" Width="120">
+                <Template>
+                    @{
+                        var tutor = (context as TutorToShow);
+                        <div><a href="/Additional-information/@tutor.Tutor.Id/@token">Посмотреть</a></div>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
 
-        </tr>
-        </thead>
-        <tbody>
-        @{
-            System.Diagnostics.Debug.Assert(_tutorsToShowList != null, nameof(_tutorsToShowList) + " != null");
-        }
-        @foreach (var tut in _tutorsToShowList)
-        {
-            <tr>
-                <td>@tut.Tutor.Name</td>
-                <td>@tut.Tutor.WorkFormat</td>
-                <td>@tut.Tutor.Description</td>
-                <td>@tut.Tutor.PricePerHour</td>
-                <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
-                <td>@tut.Subjects</td>
-                <td><button class="btn btn-primary" @onclick="@(() => DeleteFromFavorites(tut.Tutor.Id))">удалить</button></td>
-                <td><button class="btn btn-primary" @onclick="@(() => GoToChat())">чат</button></td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <style>
+    .image img {
+        height: 55px;
+        width: 55px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+    </style>
 }
 
 @code {
     [Parameter]
-    public string Token { get; set; }
+    public string token { get; set; }
     
     private AuthorizedUser? _client;
     private List<TutorResult>? _tutorsList;
     private List<TutorToShow>? _tutorsToShowList;
     private string _message = "Загрузка...";
-    private string Start { get; set; } = "http://localhost:6001/";
-
+    private readonly string _start = "http://localhost:6001/";
     
     protected override async Task OnInitializedAsync()
     {
-        var responseMessage = await _http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
+        var responseMessage = await _http.GetAsync($"http://localhost:4000/api/authorization?token={token}");
         _client = responseMessage.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (_client == null || _client.UserId == null)
         {
             _navigationManager.NavigateTo("http://localhost:5000/Login");
         }
+        // _client = new AuthorizedUser()
+        // {
+        //     UserId = Guid.Parse("84a446dc-b019-4ad5-ba7c-7a85e79ebc06"),
+        //     UserType = "Client"
+        // };
         _tutorsList = new List<TutorResult>();
         _tutorsToShowList = new List<TutorToShow>();
         
-        var response = await _http.GetAsync(Start + $"favorites/{_client.UserId}/getTutorsFromFavorites");
+        var response = await _http.GetAsync(_start + $"favorites/{_client.UserId}/getTutorsFromFavorites");
         if (response.IsSuccessStatusCode)
         {
             _tutorsList = response.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
@@ -81,22 +127,11 @@ else
         {
             foreach (var tutor in _tutorsList)
             {
-                tutor.Description ??= "-";
-                var resp = await _http.GetAsync(Start + $"searcher/{tutor.Id}/getAllSubjects");
+                var resp = await _http.GetAsync(_start + $"searcher/{tutor.Id}/getAllSubjects");
                 var subjects = resp.Content.ReadFromJsonAsync<List<string>>().Result;
                 _tutorsToShowList.Add(new TutorToShow(tutor, subjects));
             }
         }
         _message = "У вас пока нет репетиторов в Избранном";
-    }
-
-    private async Task DeleteFromFavorites(Guid tutorId)
-    {
-        await _http.DeleteAsync(Start + $"favorites/{_client.UserId}/deleteTutorFromFavorites?tutorId={tutorId}");
-    }
-
-    private async Task GoToChat()
-    {
-        
     }
 }

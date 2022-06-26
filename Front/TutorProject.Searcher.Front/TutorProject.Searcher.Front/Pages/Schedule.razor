@@ -1,4 +1,4 @@
-﻿@page "/search/schedule/{tutorId}/{token}"
+﻿@page "/Additional-information/{tutorId}/{token}"
 @using TutorProject.Searcher.Front.Models
 @using Newtonsoft.Json
 @inject NavigationManager NavigationManager
@@ -143,6 +143,7 @@
     private string ClientId { get; set; }
     private ScheduleResult? TutorSchedule { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
+    private string Start { get; set; } = "http://localhost:6001/";
     private string ScheduleStart { get; set; } = "http://localhost:6001/schedule/";
     private string ListsStart { get; set; } = "http://localhost:6001/";
     private string TutorFormat { get; set; }

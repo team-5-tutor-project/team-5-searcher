@@ -10,6 +10,16 @@
 {
     <div>
         <h2 style="word-spacing: 6px"><strong>@TutorSchedule?.Tutor.Name</strong> @TutorSchedule?.Tutor.PricePerHour₽ </h2>
+        @if (TutorSubjects != null)
+        {
+            <div>
+                @foreach (var sub in TutorSubjects)
+                {
+                    <h4>@sub </h4>
+                }
+            </div>
+        }
+        
         
         @switch (@TutorFormat)
         {
@@ -60,10 +70,13 @@
     </div>
     <br>
     <br>
-    <div>
-        <h5><strong>Описание</strong></h5> 
-        <h6>@TutorSchedule?.Tutor.Description</h6>
-    </div>
+    @if (TutorSchedule.Tutor.Description != null)
+    {
+        <div>
+            <h5><strong>Описание</strong></h5> 
+            <h6>@TutorSchedule?.Tutor.Description</h6>
+        </div>
+    }
     <br>
 <br>
     <h5><strong>Расписание</strong></h5>
@@ -143,9 +156,11 @@
     private AuthorizedUser User { get; set; }
     private string ClientId { get; set; }
     private ScheduleResult? TutorSchedule { get; set; }
+    private List<string>? TutorSubjects { get; set; }
     private List<string> LessonTime { get; set; } = new List<string>();
     private string Start { get; set; } = "http://localhost:6001/";
     private string ScheduleStart { get; set; } = "http://localhost:6001/schedule/";
+    private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
     private string ListsStart { get; set; } = "http://localhost:6001/";
     private string TutorFormat { get; set; }
     private bool InFav { get; set; }
@@ -178,6 +193,10 @@
         uri = ListsStart + $"blacklist/{ClientId}/checkTutorInBlacklist?tutorId={TutorId}";
         responseMessage = await Http.GetAsync(uri);
         InBL = (responseMessage.Content.ReadFromJsonAsync<bool>().Result);
+        
+        var subjResponse = await Http.GetAsync(SearchStart + $"{TutorId}/getAllSubjects");
+        var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+        TutorSubjects = subjects;
     }
     
         
@@ -209,15 +228,16 @@
         HttpContent content = new StringContent(json);
         await Http.PostAsync(uri, content);
     }
-    
+
     private async Task DeleteFromFavorites()
     {
         InFav = false;
         var responseMessage = await Http.DeleteAsync(ListsStart + $"favorites/{ClientId}/deleteTutorFromFavorites?tutorId={TutorId}");
-    
-        private async Task StartChat()
+    }
+
+    private async Task StartChat()
     {
-        var uri = "http://locallhost:8000/v1/chats/default";
+        var uri = "http://localhost:8000/v1/chats/default";
         var chat = new Chat {user_name_first = TutorId, user_name_second = ClientId, chat_name = $"{TutorId},{ClientId}"};
         string json = JsonConvert.SerializeObject(chat);
         HttpContent content = new StringContent(json);

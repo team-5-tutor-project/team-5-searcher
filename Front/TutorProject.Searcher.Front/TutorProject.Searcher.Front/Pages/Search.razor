@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components
 @using Newtonsoft.Json;
 @using TutorProject.Searcher.Front.Models
+@using System.Net
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -137,7 +138,14 @@
                         <div class="text-center">
                             @if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass != 0)
                             {
-                                <p>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</p>
+                                @if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass == tut.Tutor.PupilMinClass)
+                                {
+                                    <p>@tut.Tutor.PupilMinClass</p>
+                                }
+                                else
+                                {
+                                    <p>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</p>
+                                }
                             }
                             else
                             {
@@ -191,11 +199,17 @@
         TutorsToShowList = new List<TutorToShow>();
 
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
+        if (authoResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            NavigationManager.NavigateTo("http://localhost:5000/login");
+        }        
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+
         if (User.UserId == null)
         {
             NavigationManager.NavigateTo("http://localhost:5000/login");
-        }
+        }        
+
         ClientID = User.UserId.ToString();
         var tutorsResponse = await Http.GetAsync(SearchStart + $"{ClientID}/getAllTutors");
         TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;

@@ -2,6 +2,7 @@
 @using TutorProject.Searcher.Front.Models
 @using Newtonsoft.Json
 @using System.Net
+@using System.Text
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -33,7 +34,14 @@
                 <h5 class="mb-2 text-muted">Онлайн</h5>
                 break;
         }
-        <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PupilMinClass - @TutorSchedule?.Tutor.PupilMaxClass классы</h5>
+        @if (TutorSchedule?.Tutor.PupilMinClass < TutorSchedule?.Tutor.PupilMaxClass)
+        {
+            <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PupilMinClass - @TutorSchedule?.Tutor.PupilMaxClass классы</h5>
+        }
+        @if (TutorSchedule?.Tutor.PupilMinClass != 0 && TutorSchedule?.Tutor.PupilMaxClass == TutorSchedule?.Tutor.PupilMinClass)
+        {
+            <h5 class="mb-2 text-muted">@TutorSchedule?.Tutor.PupilMinClass класс</h5>
+        }
     </div>
 
     
@@ -170,10 +178,14 @@
     protected override async Task OnInitializedAsync()
     {
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
+        if (authoResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            NavigationManager.NavigateTo("http://localhost:5000/login");
+        }
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
-            NavigationManager.NavigateTo("http://localhost:7020/login");
+            NavigationManager.NavigateTo("http://localhost:5000/login");
         }
         ClientId = User.UserId.ToString();
         
@@ -240,20 +252,20 @@
         var uri = "http://localhost:8000/v1/chats/default";
         var chat = new Chat {user_name_first = TutorId, user_name_second = ClientId, chat_name = $"{TutorId},{ClientId}"};
         string json = JsonConvert.SerializeObject(chat);
-        HttpContent content = new StringContent(json);
+        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
         var result = await Http.PostAsync(uri, content);
-        ReceivedChat receivedChat = result.Content.ReadFromJsonAsync<ReceivedChat>().Result;
+        var receivedChat = result.Content.ReadFromJsonAsync<ReceivedChat>().Result;
         
-        var response = await Http.GetAsync($"http://localhost:4000/api/chats/{receivedChat.chatId}?token={Token}");
-        if (response.StatusCode == HttpStatusCode.BadRequest)
+        var response = await Http.GetAsync($"http://localhost:4000/api/chats/{receivedChat.chat_id}?token={Token}");
+        if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
             uri = $"http://localhost:4000/api/chats?token={Token}";
-            var chatDto = new ChatDto {ChatID = new Guid(receivedChat.chatId), ClientID = new Guid(ClientId), TutorID = new Guid(TutorId)};
+            var chatDto = new ChatDto {ChatID = new Guid(receivedChat.chat_id), ClientID = new Guid(ClientId), TutorID = new Guid(TutorId)};
             json = JsonConvert.SerializeObject(chatDto);
-            content = new StringContent(json);
+            content = new StringContent(json, Encoding.UTF8, "application/json");
             await Http.PostAsync(uri, content);
         }
 
-        NavigationManager.NavigateTo($"http://localhost:9000/chat/{receivedChat.chatId}/{Token}");
+        NavigationManager.NavigateTo($"http://localhost:9000/chat/{receivedChat.chat_id}/{Token}");
     }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/Schedule-editor/{token}"
 @using TutorProject.Searcher.Front.Models
 @using Newtonsoft.Json
+@using System.Net
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -87,11 +88,16 @@
     protected override async Task OnInitializedAsync()
     {
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
+        if (authoResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            NavigationManager.NavigateTo("http://localhost:5000/login");
+        }        
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
+
         if (User.UserId == null)
         {
-            NavigationManager.NavigateTo("http://localhost:7020/login");
-        }
+            NavigationManager.NavigateTo("http://localhost:5000/login");
+        } 
         UserId = User.UserId.ToString();
         
         var response = await Http.GetAsync(ScheduleStart + $"{UserId}/getSchedule");

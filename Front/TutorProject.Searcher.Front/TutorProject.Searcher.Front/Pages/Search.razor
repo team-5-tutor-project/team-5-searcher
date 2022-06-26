@@ -7,6 +7,11 @@
 @inject HttpClient Http
 
 <PageTitle>Search</PageTitle>
+<button class="btn btn-warning" style="float: right" @onclick="() => NavigateToHome()">
+    Домой
+</button>
+<br>
+<br>
 
 <h1>Поиск</h1>
 
@@ -354,5 +359,10 @@ else
         if (type == "pupilclass") TutorToSearch.PupilClass = 0;
         if (type == "workformat") TutorToSearch.WorkFormat = "";
         if (type == "order") TutorToSearch.TutorsOrder = "";
+    }
+    
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("http://localhost:5000/login");
     }
 }

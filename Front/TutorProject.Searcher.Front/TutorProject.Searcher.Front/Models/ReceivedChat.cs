@@ -2,5 +2,5 @@
 
 public class ReceivedChat
 {
-    public string chatId { get; init; }
+    public string chat_id { get; init; }
 }

@@ -124,7 +124,8 @@ else
 
 <p>@Message</p>
 
-<div class = "alert w-auto">
+@if (@IsTable){
+    <div class = "alert w-auto">
         <table class="table table-sm table-hover">
             <thead class="table-bordered border-top-0">
             <tr>
@@ -196,13 +197,14 @@ else
                     <td><div class="text-center">
                             @tut.Subjects
                         </div>
-                        </td>
+                    </td>
                     <td><div class="text-center"><a href="/Additional-information/@tut.Tutor.Id/@Token">Посмотреть</a></div></td>
                 </tr>
             }
             </tbody>
         </table>
     </div>
+}
 
 @code {
     [Parameter]
@@ -216,6 +218,7 @@ else
     private string[]? Formats { get; set; }
     private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
     private bool IsParam { get; set; }
+    private bool IsTable { get; set; }
     private string Message { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -226,6 +229,7 @@ else
         TutorsList = new List<TutorResult>();
         TutorsToShowList = new List<TutorToShow>();
         IsParam = false;
+        IsTable = true;
         Message = "Загрузка...";
 
         var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
@@ -241,15 +245,26 @@ else
         }        
 
         ClientID = User.UserId.ToString();
+        
         var tutorsResponse = await Http.GetAsync(SearchStart + $"{ClientID}/getAllTutors");
-        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
-        foreach (var tutor in TutorsList)
+        if (tutorsResponse.StatusCode == HttpStatusCode.NotFound)
         {
-            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
-            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
-            TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            TutorsToShowList = new List<TutorToShow>();
+            Message = "По вашему запросу ничего не найдено :(";
+            IsTable = false;
         }
-        Message = "";
+        else
+        {
+            IsTable = true;
+            TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+            foreach (var tutor in TutorsList)
+            {
+                var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
+                var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+                TutorsToShowList.Add(new TutorToShow(tutor, subjects));
+            }
+            Message = "";
+        }
     }
     
     private async Task SearchTutor()
@@ -298,17 +313,27 @@ else
                    $"&Schedule={TutorToSearch.Friday}&Schedule={TutorToSearch.Saturday}&Schedule={TutorToSearch.Sunday}";
         
         var tutorsResponse = await Http.GetAsync(request);
-        TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
-        TutorsToShowList = new List<TutorToShow>();
-        var result = new List<TutorToShow>();
-        foreach (var tutor in TutorsList)
+        if (tutorsResponse.StatusCode == HttpStatusCode.NotFound)
         {
-            var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
-            var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
-            result.Add(new TutorToShow(tutor, subjects));
+            TutorsToShowList = new List<TutorToShow>();
+            Message = "По вашему запросу ничего не найдено :(";
+            IsTable = false;
         }
-        TutorsToShowList = result;
-        Message = "";
+        else
+        {
+            IsTable = true;
+            TutorsList = tutorsResponse.Content.ReadFromJsonAsync<List<TutorResult>>().Result;
+            TutorsToShowList = new List<TutorToShow>();
+            var result = new List<TutorToShow>();
+            foreach (var tutor in TutorsList)
+            {
+                var subjResponse = await Http.GetAsync(SearchStart + $"{tutor.Id}/getAllSubjects");
+                var subjects = subjResponse.Content.ReadFromJsonAsync<List<string>>().Result;
+                result.Add(new TutorToShow(tutor, subjects));
+            }
+            TutorsToShowList = result;
+            Message = "";
+        }
     }
     
     private void ShowParameters()

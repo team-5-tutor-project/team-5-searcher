@@ -57,7 +57,7 @@
 ![image](https://user-images.githubusercontent.com/79813229/175834741-d5ec98ec-816e-440a-ba2c-76ea89dfac3e.png)
 
 ### Страница редактирования расписания репетитора
-![image](https://user-images.githubusercontent.com/79813229/175834983-b24b8173-c546-448b-ab00-dbbe0e847819.png)
+![image](https://user-images.githubusercontent.com/79813229/175837082-1c16d07e-7475-4014-a72a-5bd5bad0f6de.png)
 
 ## Instruction
 

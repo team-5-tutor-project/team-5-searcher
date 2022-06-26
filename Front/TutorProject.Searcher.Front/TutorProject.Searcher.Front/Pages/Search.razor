@@ -97,42 +97,78 @@
 </div>
 <br />
 
-<table class="table">
-        <thead>
-        <tr>
-            <th>Имя</th>
-            <th>Описание</th>
-            <th>Формат работы</th>
-            <th>Цена за час</th>
-            <th>Классы обучения</th>
-            <th>Предметы</th>
-            <th>Расписание</th>
-            <th>ЧС</th>
-            <th>Избранное</th>
-            <th>Начать чат</th>
-        </tr>
-        </thead>
-        <tbody>
-        @{
-            System.Diagnostics.Debug.Assert(TutorsList != null, nameof(TutorsList) + " != null");
-        }
-        @foreach (var tut in TutorsToShowList)
-        {
+<div class = "alert w-auto">
+        <table class="table table-sm table-hover">
+            <thead class="table-bordered border-top-0">
             <tr>
-                <td>@tut.Tutor.Name</td>
-                <td>@tut.Tutor.Description</td>
-                <td>@tut.Tutor.WorkFormat</td>
-                <td>@tut.Tutor.PricePerHour</td>
-                <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
-                <td>@tut.Subjects</td>
-                <td><button class="btn btn-primary" @onclick="@(()=> NavToSchedule(@tut.Tutor.Id.ToString()))">расписание</button></td>
-                <td><button class="btn btn-primary" @onclick="@(()=> AddToBlackList(@tut.Tutor.Id.ToString()))">чс</button></td>
-                <td><button class="btn btn-primary" @onclick="@(()=> AddToFavourites(@tut.Tutor.Id.ToString()))">изб</button></td>
-                <td><button class="btn btn-primary" @onclick="@(()=> StartChat(@tut.Tutor.Id.ToString()))">чат</button></td>
+                <th scope="col" class="text-center">Имя</th>
+                <th scope="col" class="text-center">Цена за час</th>
+                <th scope="col" class="text-center">Классы обучения</th>
+                <th scope="col" class="text-center">Предметы</th>
+                <th scope="col" class="text-center">Подробная информация</th>
+
             </tr>
-        }
-        </tbody>
-</table>
+            </thead>
+            <tbody>
+            @{
+                System.Diagnostics.Debug.Assert(TutorsToShowList != null, nameof(TutorsToShowList) + " != null");
+            }
+            @foreach (var tut in TutorsToShowList)
+            {
+                <tr>
+                    <td>
+                        <div class="text-center">
+                            @tut.Tutor.Name
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            @if (tut.Tutor.PricePerHour != 0)
+                            {
+                                <p>@tut.Tutor.PricePerHour</p>
+                            }
+                            else
+                            {
+                                <p>Не указана</p>
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            @if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass != 0)
+                            {
+                                <p>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</p>
+                            }
+                            else
+                            {
+                                if (tut.Tutor.PupilMinClass == 0 && tut.Tutor.PupilMaxClass != 0)
+                                {
+                                    <p>Не старше @tut.Tutor.PupilMaxClass</p>
+                                }
+                                else
+                                {
+                                    if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass == 0)
+                                    {
+                                        <p>Не младше @tut.Tutor.PupilMinClass</p>
+                                    }
+                                    else
+                                    {
+                                        <p>Не указаны</p>
+                                    }
+                                }
+                            }
+                        </div>
+                    </td>
+                    <td><div class="text-center">
+                            @tut.Subjects
+                        </div>
+                        </td>
+                    <td><div class="text-center"><a href="/Additional-information/@tut.Tutor.Id/@Token">Посмотреть</a></div></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 
 @code {
     [Parameter]
@@ -145,7 +181,6 @@
     private string[]? Orders { get; set; }
     private string[]? Formats { get; set; }
     private string SearchStart { get; set; } = "http://localhost:6001/searcher/";
-    private string ListsStart { get; set; } = "http://localhost:6001/";
 
     protected override async Task OnInitializedAsync()
     {
@@ -227,33 +262,5 @@
             result.Add(new TutorToShow(tutor, subjects));
         }
         TutorsToShowList = result;
-    }
-    
-    private void NavToSchedule(string tutorId)
-    {
-        NavigationManager.NavigateTo($"/search/schedule/{tutorId}/{Token}");
-    }
-    
-    private async Task AddToBlackList(string tutorId)
-    {
-        var uri = ListsStart + $"blacklist/{ClientID}/addTutorToBlacklist?tutorId={tutorId}";
-        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
-        string json = JsonConvert.SerializeObject(clientToTutor);
-        HttpContent content = new StringContent(json);
-        await Http.PostAsync(uri, content);
-    }
-    
-    private async Task AddToFavourites(string tutorId)
-    {
-        var uri = ListsStart + $"favorites/{ClientID}/addTutorToFavorites?tutorId={tutorId}";
-        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientID), Tutor = new Guid(tutorId)};
-        string json = JsonConvert.SerializeObject(clientToTutor);
-        HttpContent content = new StringContent(json);
-        await Http.PostAsync(uri, content);
-    }
-
-    private void StartChat(string tutorId)
-    {
-        
     }
 }

@@ -14,39 +14,78 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Имя</th>
-            <th>Формат работы</th>
-            <th>Описание</th>
-            <th>Цена за час</th>
-            <th>Классы обучения</th>
-            <th>Предметы</th>
-            <th></th>
-            <th></th>
-
-        </tr>
-        </thead>
-        <tbody>
-        @{
-            System.Diagnostics.Debug.Assert(_tutorsToShowList != null, nameof(_tutorsToShowList) + " != null");
-        }
-        @foreach (var tut in _tutorsToShowList)
-        {
+    <div class = "alert w-auto">
+        <table class="table table-sm table-hover">
+            <thead class="table-bordered border-top-0">
             <tr>
-                <td>@tut.Tutor.Name</td>
-                <td>@tut.Tutor.WorkFormat</td>
-                <td>@tut.Tutor.Description</td>
-                <td>@tut.Tutor.PricePerHour</td>
-                <td>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</td>
-                <td>@tut.Subjects</td>
-                <td><button class="btn btn-primary" @onclick="@(() => DeleteFromBlacklist(tut.Tutor.Id))">удалить</button></td>
-                <td><button class="btn btn-primary" @onclick="@(() => GoToChat())">чат</button></td>
+                <th scope="col" class="text-center">Имя</th>
+                <th scope="col" class="text-center">Цена за час</th>
+                <th scope="col" class="text-center">Классы обучения</th>
+                <th scope="col" class="text-center">Предметы</th>
+                <th scope="col" class="text-center">Подробная информация</th>
+
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @{
+                System.Diagnostics.Debug.Assert(_tutorsToShowList != null, nameof(_tutorsToShowList) + " != null");
+            }
+            @foreach (var tut in _tutorsToShowList)
+            {
+                <tr>
+                    <td>
+                        <div class="text-center">
+                            @tut.Tutor.Name
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            @if (tut.Tutor.PricePerHour != 0)
+                            {
+                                <p>@tut.Tutor.PricePerHour</p>
+                            }
+                            else
+                            {
+                                <p>Не указана</p>
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            @if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass != 0)
+                            {
+                                <p>@tut.Tutor.PupilMinClass - @tut.Tutor.PupilMaxClass</p>
+                            }
+                            else
+                            {
+                                if (tut.Tutor.PupilMinClass == 0 && tut.Tutor.PupilMaxClass != 0)
+                                {
+                                    <p>Не старше @tut.Tutor.PupilMaxClass</p>
+                                }
+                                else
+                                {
+                                    if (tut.Tutor.PupilMinClass != 0 && tut.Tutor.PupilMaxClass == 0)
+                                    {
+                                        <p>Не младше @tut.Tutor.PupilMinClass</p>
+                                    }
+                                    else
+                                    {
+                                        <p>Не указаны</p>
+                                    }
+                                }
+                            }
+                        </div>
+                    </td>
+                    <td><div class="text-center">
+                            @tut.Subjects
+                        </div>
+                        </td>
+                    <td><div class="text-center"><a href="/Additional-information/@tut.Tutor.Id/@token">Посмотреть</a></div></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {
@@ -88,15 +127,5 @@ else
             }
         }
         _message = "У вас пока нет репетиторов в Черном списке";
-    }
-
-    private async Task DeleteFromBlacklist(Guid tutorId)
-    {
-        await _http.DeleteAsync(Start + $"blacklist/{_client.UserId}/deleteTutorFromBlacklist?tutorId={tutorId}");
-    }
-
-    private async Task GoToChat()
-    {
-        
     }
 }

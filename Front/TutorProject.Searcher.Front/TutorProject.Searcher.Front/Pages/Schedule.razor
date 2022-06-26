@@ -1,5 +1,6 @@
 ﻿@page "/Additional-information/{tutorId}/{token}"
 @using TutorProject.Searcher.Front.Models
+@using Newtonsoft.Json
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -104,6 +105,29 @@ else
     private async Task DeleteFromFavorites(Guid tutorId)
     {
         await Http.DeleteAsync(Start + $"favorites/{ClientId}/deleteTutorFromFavorites?tutorId={tutorId}");
+    }
+    
+    private async Task DeleteFromBlacklist(Guid tutorId)
+    {
+        await Http.DeleteAsync(Start + $"blacklist/{ClientId}/deleteTutorFromBlacklist?tutorId={tutorId}");
+    }
+    
+    private async Task AddToBlackList(string tutorId)
+    {
+        var uri = Start + $"blacklist/{ClientId}/addTutorToBlacklist?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
+    }
+    
+    private async Task AddToFavourites(string tutorId)
+    {
+        var uri = Start + $"favorites/{ClientId}/addTutorToFavorites?tutorId={tutorId}";
+        var clientToTutor = new ClientToTutor { Id = new Guid(), Client  = new Guid(ClientId), Tutor = new Guid(tutorId)};
+        string json = JsonConvert.SerializeObject(clientToTutor);
+        HttpContent content = new StringContent(json);
+        await Http.PostAsync(uri, content);
     }
     
     private void StartChat(string? tutorId)

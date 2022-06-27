@@ -113,15 +113,15 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        var responseMessage = await _http.GetAsync($"https://tutor-project-test.herokuapp.com/api/authorization?token={token}");
+        var responseMessage = await _http.GetAsync($"http://localhost:4000/api/authorization?token={token}");
         if (responseMessage.StatusCode == HttpStatusCode.BadRequest)
         {
-            _navigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+            _navigationManager.NavigateTo("http://localhost:5000/login");
         }
         _client = responseMessage.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (_client.UserId == null)
         {
-            _navigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+            _navigationManager.NavigateTo("http://localhost:5000/login");
         }        
         
         _tutorsList = new List<TutorResult>();
@@ -148,6 +148,6 @@ else
     
     private void NavigateToHome()
     {
-        _navigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+        _navigationManager.NavigateTo("http://localhost:5000/login");
     }
 }

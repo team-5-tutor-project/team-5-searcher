@@ -190,15 +190,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authoResponse = await Http.GetAsync($"https://tutor-project-test.herokuapp.com/api/authorization?token={Token}");
+        var authoResponse = await Http.GetAsync($"http://localhost:4000/api/authorization?token={Token}");
         if (authoResponse.StatusCode == HttpStatusCode.BadRequest)
         {
-            NavigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+            NavigationManager.NavigateTo("http://localhost:5000/login");
         }
         User = authoResponse.Content.ReadFromJsonAsync<AuthorizedUser>().Result;
         if (User.UserId == null)
         {
-            NavigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+            NavigationManager.NavigateTo("http://localhost:5000/login");
         }
         ClientId = User.UserId.ToString();
         
@@ -284,6 +284,6 @@
     
     private void NavigateToHome()
     {
-        NavigationManager.NavigateTo("https://tutor-project-account.herokuapp.com/Login");
+        NavigationManager.NavigateTo("http://localhost:5000/login");
     }
 }
